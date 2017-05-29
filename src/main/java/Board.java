@@ -8,15 +8,15 @@ public class Board {
   private final boolean isGoal;
   private final int[][] blocks;
   private final int rowOfBlank, colOfBlank;
-  private final int hashCode;
+  private final long hashCode;
   private int tmpRow, tmpCol;
 
-  private static Map<Integer, Board> blocksCache;
+  private static Map<Long, Board> blocksCache;
   private static Board newBoard(int [][] blocks){
     if (blocksCache == null){
-      blocksCache = new HashMap<Integer, Board>();
+      blocksCache = new HashMap<Long, Board>();
     }
-    int hash = calcHash(blocks);
+    long hash = calcHash(blocks);
     if (blocksCache.containsKey(hash)){
       return blocksCache.get(hash);
     }
@@ -33,8 +33,8 @@ public class Board {
     return r;
   }
 
-  private static int calcHash(int [][] blocks){
-    int r = 0;
+  private static long calcHash(int [][] blocks){
+    long r = 0;
     for (int row = 0; row < blocks.length; row++){
       for (int col = 0; col < blocks.length; col++){
         int i = row*blocks.length+col+1;
@@ -78,7 +78,7 @@ public class Board {
     this.hamming = calcHamming();
     this.manhattan = calcManhattan();
     this.isGoal = calcIsGoal();
-    this.hashCode = calcHash();
+    this.hashCode = calcHash(blocks);
     // throw error if noBlank
   }
 
@@ -228,10 +228,6 @@ public class Board {
   public Board twin()                    // a board that is obtained by exchanging any pair of blocks
   {
     return null;
-  }
-
-  private int calcHash(){
-    return calcHash(blocks);
   }
 
   public boolean equals(Object other)        // does this board equal y?
