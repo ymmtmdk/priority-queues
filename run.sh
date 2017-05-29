@@ -1,3 +1,3 @@
-CP=lib/algs4.jar:target/classes
-cat a.txt | java -cp "$CP" Permutation 3
-
+# CP=lib/algs4.jar:build/classes/main:src/main/java
+CP=lib/algs4.jar:src/main/java
+java -Xrunhprof:cpu=times,file=cpu_times.txt -cp "$CP" Solver ./8puzzle/puzzle04.txt

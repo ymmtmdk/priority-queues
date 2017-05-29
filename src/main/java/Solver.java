@@ -117,8 +117,8 @@ public class Solver {
     }
 
     private int priority(){
-      return 0 - (moves*3 + board.hamming()*2 + board.manhattan());
-      // return 0 - (moves + board.manhattan());
+      return 0 - (moves + board.manhattan());
+      // return 0 - (moves + board.hamming());
     }
 
     public int compareTo(BoardNode that){
@@ -177,6 +177,7 @@ public class Solver {
   {
     return aStarSolver.result.size()-1;
   }
+
   public Iterable<Board> solution()      // sequence of boards in a shortest solution; null if unsolvable
   {
     Deque<Board> q = new ArrayDeque<Board>();
@@ -185,6 +186,7 @@ public class Solver {
     }
     return q;
   }
+
   public static void main(String[] args) {
     // create initial board from file
     In in = new In(args[0]);
@@ -208,248 +210,4 @@ public class Solver {
     }
   }
 }
-/*
-   function A*(start, goal)
-// The set of nodes already evaluated.
-closedSet := {}
-// The set of currently discovered nodes that are not evaluated yet.
-// Initially, only the start node is known.
-openSet := {start}
-// For each node, which node it can most efficiently be reached from.
-// If a node can be reached from many nodes, cameFrom will eventually contain the
-// most efficient previous step.
-cameFrom := the empty map
 
-// For each node, the cost of getting from the start node to that node.
-gScore := map with default value of Infinity
-// The cost of going from start to start is zero.
-gScore[start] := 0
-// For each node, the total cost of getting from the start node to the goal
-// by passing by that node. That value is partly known, partly heuristic.
-fScore := map with default value of Infinity
-// For the first node, that value is completely heuristic.
-fScore[start] := heuristic_cost_estimate(start, goal)
-
-while openSet is not empty
-current := the node in openSet having the lowest fScore[] value
-if current = goal
-return reconstruct_path(cameFrom, current)
-
-openSet.Remove(current)
-closedSet.Add(current)
-for each neighbor of current
-if neighbor in closedSet
-continue		// Ignore the neighbor which is already evaluated.
-// The distance from start to a neighbor
-tentative_gScore := gScore[current] + dist_between(current, neighbor)
-if neighbor not in openSet	// Discover a new node
-openSet.Add(neighbor)
-else if tentative_gScore >= gScore[neighbor]
-continue		// This is not a better path.
-
-// This path is the best until now. Record it!
-cameFrom[neighbor] := current
-gScore[neighbor] := tentative_gScore
-fScore[neighbor] := gScore[neighbor] + heuristic_cost_estimate(neighbor, goal)
-
-return failure
-
-function reconstruct_path(cameFrom, current)
-total_path := [current]
-while current in cameFrom.Keys:
-current := cameFrom[current]
-total_path.append(current)
-return total_path
-
-public class Solver {
-abstract private class AStar{
-abstract int heuristic_cost_estimate(BoardNode start, BoardNode goal);
-abstract int dist_between(BoardNode current, BoardNode neighbor);
-
-Deque<BoardNode> aStar(BoardNode start, BoardNode goal){
-// The set of nodes already evaluated.
-Set<BoardNode> closedSet = new HashSet<BoardNode>();
-// The set of currently discovered nodes that are not evaluated yet.
-// Initially, only the start node is known.
-PriorityQueue<BoardNode> openSet = new PriorityQueue<BoardNode>();
-openSet.add(start);
-// For each node, which node it can most efficiently be reached from.
-// If a node can be reached from many nodes, cameFrom will eventually contain the
-// most efficient previous step.
-Map<BoardNode, BoardNode> cameFrom = new HashMap<BoardNode, BoardNode>(); //the empty map
-
-// For each node, the cost of getting from the start node to that node.
-Map<BoardNode, Integer> gScore = new HashMap<BoardNode, Integer>(); //map with default value of Infinity
-// The cost of going from start to start is zero.
-gScore.put(start, 0);
-// For each node, the total cost of getting from the start node to the goal
-// by passing by that node. That value is partly known, partly heuristic.
-Map<BoardNode, Integer> fScore = new HashMap<BoardNode, Integer>(); //map with default value of Infinity
-// For the first node, that value is completely heuristic.
-fScore.put(start, heuristic_cost_estimate(start, goal));
-
-while (!openSet.isEmpty()){
-  BoardNode current = openSet.poll(); //the node in openSet having the lowest fScore[] value
-  if (current.equals(goal))
-    return reconstruct_path(cameFrom, current);
-
-  // openSet.Remove(current)
-  closedSet.add(current);
-  for (BoardNode neighbor : current.neighbors()){
-    if (closedSet.contains(neighbor))
-      continue;		// Ignore the neighbor which is already evaluated.
-    // The distance from start to a neighbor
-    int tentative_gScore = gScore.get(current) + dist_between(current, neighbor);
-    if (!openSet.contains(neighbor)) // not in openSet	// Discover a new node
-      openSet.add(neighbor);
-    else if (tentative_gScore >= gScore.get(neighbor))
-      continue;		// This is not a better path.
-
-    // This path is the best until now. Record it!
-    cameFrom.put(neighbor, current);
-    gScore.put(neighbor, tentative_gScore);
-    fScore.put(neighbor, gScore.get(neighbor) + heuristic_cost_estimate(neighbor, goal));
-    // return 0;
-  }
-}
-
-return null;
-}
-
-Deque<BoardNode> reconstruct_path(Map<BoardNode, BoardNode> cameFrom, BoardNode current){
-  Deque<BoardNode> total_path = new ArrayDeque<BoardNode>();
-  total_path.push(current);
-  // total_path := [current]
-  while (cameFrom.containsKey(current)){
-    // while current in cameFrom.Keys:
-    current = cameFrom.get(current);
-    // current := cameFrom[current]
-    total_path.add(current);
-  }
-  return total_path;
-}
-}
-
-private class BoardNode{
-  public Iterable<BoardNode> neighbors(){
-    return null;
-  }
-  // abstract public int compareTo(BoardNode that);
-}
-
-private class BoardNode extends Node{
-  BoardNode(Board board){
-
-  }
-  public int compareTo(BoardNode other){
-    return 0;
-  }
-  public Iterable<Node> neighbors(){
-    return null;
-  }
-}
-
-private class AStarSolver extends AStar{
-  int heuristic_cost_estimate(BoardNode start, BoardNode goal){
-    return 0;
-  }
-  int dist_between(BoardNode current, BoardNode neighbor){
-    return 1;
-  }
-
-  AStarSolver(Board board){
-  }
-}
-public Solver(Board initial)           // find a solution to the initial board (using the A* algorithm)
-{
-}
-public boolean isSolvable()            // is the initial board solvable?
-{
-  return false;
-}
-public int moves()                     // min number of moves to solve initial board; -1 if unsolvable
-{
-  return 0;
-}
-public Iterable<Board> solution()      // sequence of boards in a shortest solution; null if unsolvable
-{
-  return null;
-}
-// public static void main(String[] args) // solve a slider puzzle (given below)
-// public static void main(String[] args) // unit tests (not graded)
-public static void main(String[] args) {
-  // create initial board from file
-  In in = new In(args[0]);
-  int n = in.readInt();
-  int[][] blocks = new int[n][n];
-  for (int i = 0; i < n; i++)
-    for (int j = 0; j < n; j++)
-      blocks[i][j] = in.readInt();
-  Board initial = new Board(blocks);
-
-  // solve the puzzle
-  Solver solver = new Solver(initial);
-
-  // print solution to standard output
-  if (!solver.isSolvable())
-    StdOut.println("No solution possible");
-  else {
-    StdOut.println("Minimum number of moves = " + solver.moves());
-    for (Board board : solver.solution())
-      StdOut.println(board);
-  }
-}
-}
-/*
-   function A*(start, goal)
-// The set of nodes already evaluated.
-closedSet := {}
-// The set of currently discovered nodes that are not evaluated yet.
-// Initially, only the start node is known.
-openSet := {start}
-// For each node, which node it can most efficiently be reached from.
-// If a node can be reached from many nodes, cameFrom will eventually contain the
-// most efficient previous step.
-cameFrom := the empty map
-
-// For each node, the cost of getting from the start node to that node.
-gScore := map with default value of Infinity
-// The cost of going from start to start is zero.
-gScore[start] := 0
-// For each node, the total cost of getting from the start node to the goal
-// by passing by that node. That value is partly known, partly heuristic.
-fScore := map with default value of Infinity
-// For the first node, that value is completely heuristic.
-fScore[start] := heuristic_cost_estimate(start, goal)
-
-while openSet is not empty
-current := the node in openSet having the lowest fScore[] value
-if current = goal
-return reconstruct_path(cameFrom, current)
-
-openSet.Remove(current)
-closedSet.Add(current)
-for each neighbor of current
-if neighbor in closedSet
-continue		// Ignore the neighbor which is already evaluated.
-// The distance from start to a neighbor
-tentative_gScore := gScore[current] + dist_between(current, neighbor)
-if neighbor not in openSet	// Discover a new node
-openSet.Add(neighbor)
-else if tentative_gScore >= gScore[neighbor]
-continue		// This is not a better path.
-
-// This path is the best until now. Record it!
-cameFrom[neighbor] := current
-gScore[neighbor] := tentative_gScore
-fScore[neighbor] := gScore[neighbor] + heuristic_cost_estimate(neighbor, goal)
-
-return failure
-
-function reconstruct_path(cameFrom, current)
-total_path := [current]
-while current in cameFrom.Keys:
-current := cameFrom[current]
-total_path.append(current)
-return total_path
-*/

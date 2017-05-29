@@ -159,7 +159,7 @@ class TestSolver{
     for (n in 1..6){
       assertEquals(n, Util.solver(In("8puzzle/puzzle3x3-%02d.txt".format(n))).moves())
     }
-    for (n in 1..22){
+    for (n in 1..28){
       assertEquals(n, Util.solver(In("8puzzle/puzzle4x4-%02d.txt".format(n))).moves())
     }
     println(Board.fi("fact", 10))
