@@ -72,13 +72,9 @@ public class Board {
     return true;
   }
 
-
   // (where blocks[i][j] = block in row i, column j)
   public Board(int[][] blocks)           // construct a board from an n-by-n array of blocks
   {
-    this.dimension = blocks.length;
-    this.blocks = copyBlocks(blocks, dimension);
-
     int c = count(blocks, (row, col, n) -> {
       if (n == 0){
         this.tmpRow = row;
@@ -91,6 +87,10 @@ public class Board {
     if (c != 1){
       throw new ArithmeticException();
     }
+
+    // Board(copyBlocks(blocks), tmpRow, tmpCol, calcHamming(blocks), calcManhattan(blocks), calcIsGoal(blocks), calcHash(blocks));
+    this.blocks = copyBlocks(blocks);
+    this.dimension = blocks.length;
     this.rowOfBlank = tmpRow;
     this.colOfBlank = tmpCol;
     this.hamming = calcHamming(blocks);
@@ -100,7 +100,18 @@ public class Board {
     // throw error if noBlank
   }
 
-  private Board neighbor(int [][] bl, Dir dir){
+  private Board(int[][] blocks, int dimension, int rowOfBlank, int colOfBlank, int hamming, int manhattan, boolean isGoal, long hashCode){
+    this.blocks = blocks;
+    this.dimension = dimension;
+    this.rowOfBlank = rowOfBlank;
+    this.colOfBlank = colOfBlank;
+    this.hamming = hamming;
+    this.manhattan = manhattan;
+    this.isGoal = isGoal;
+    this.hashCode = hashCode;
+  }
+
+  private Board neighbor(Dir dir){
     int row=-1;
     int col=-1;
 
@@ -123,9 +134,9 @@ public class Board {
         break;
     }
     // int [][] bl = copyBlocks(blocks, dimension);
-    exchange(bl, rowOfBlank, colOfBlank, row, col);
-    Board bd = newBoard(bl);
-    exchange(bl, rowOfBlank, colOfBlank, row, col);
+    exchange(blocks, rowOfBlank, colOfBlank, row, col);
+    Board bd = newBoard(blocks);
+    exchange(blocks, rowOfBlank, colOfBlank, row, col);
     return bd;
   }
 
@@ -133,7 +144,8 @@ public class Board {
     return new Board(blocks);
   }
 
-  private int[][] copyBlocks(int[][] blocks, int n){
+  private int[][] copyBlocks(int[][] blocks){
+    int n = blocks.length;
     int[][] bl = new int[n][n];
     for (int row = 0; row < n; row++){
       for (int col = 0; col < n; col++){
@@ -275,19 +287,18 @@ public class Board {
 
   public Iterable<Board> neighbors()     // all neighboring boards
   {
-    int [][] bl = blocks;//copyBlocks(blocks, dimension);
     Deque q = new ArrayDeque<Board>();
     if (rowOfBlank > 0){
-      q.add(neighbor(bl, Dir.UP));
+      q.add(neighbor(Dir.UP));
     }
     if (rowOfBlank < dimension-1){
-      q.add(neighbor(bl, Dir.DOWN));
+      q.add(neighbor(Dir.DOWN));
     }
     if (colOfBlank > 0){
-      q.add(neighbor(bl, Dir.LEFT));
+      q.add(neighbor(Dir.LEFT));
     }
     if (colOfBlank < dimension-1){
-      q.add(neighbor(bl, Dir.RIGHT));
+      q.add(neighbor(Dir.RIGHT));
     }
     return q;
   }
