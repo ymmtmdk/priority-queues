@@ -51,6 +51,23 @@ object Util{
   fun solver(inf: In): Solver{
     return Solver(board(inf))
   }
+
+  fun doPrivateMethod(target: Any, field: String): Any{
+    /*
+    val c = Util.javaClass
+    val method = c.getDeclaredMethod("f")
+    method.setAccessible(true)
+    method.invoke(Util)
+    */
+    val c = target.javaClass
+    val method = c.getMethod(field)
+    method.setAccessible(true)
+    return method.invoke(target)
+  }
+
+  private fun f(){
+    println("f")
+  }
 }
 
 class TestBoard{
@@ -85,9 +102,8 @@ class TestBoard{
     assertEquals(0, Util.board(board1).hamming())
     assertEquals(5, Util.board(board2).hamming())
   }
+
   @Test fun testManhattan(){
-    assertEquals(0, Board.manhattan(1,2,0,0))
-    assertEquals(1, Board.manhattan(2,2,0,0))
     assertEquals(0, Util.board(board1).manhattan())
     assertEquals(10, Util.board(board2).manhattan())
   }
@@ -109,7 +125,7 @@ class TestSolver{
     for (n in 1..6){
       assertEquals(n, Util.solver(In("8puzzle/puzzle3x3-%02d.txt".format(n))).moves())
     }
-    for (n in 1..16){
+    for (n in 1..22){
       assertEquals(n, Util.solver(In("8puzzle/puzzle4x4-%02d.txt".format(n))).moves())
     }
   }

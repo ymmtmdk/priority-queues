@@ -185,7 +185,7 @@ public class Board {
     System.out.println(o);
   }
 
-  static int manhattan(int n, int dimension, int row, int col){
+  private static int manhattan(int n, int dimension, int row, int col){
     /*
        8 1 3
        4   2
@@ -268,7 +268,6 @@ public class Board {
       q.add(neighbor(bl, Dir.RIGHT));
     }
     return q;
-    // return null;
   }
 
   public String toString()               // string representation of this board (in the output format specified below)
