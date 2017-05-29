@@ -61,10 +61,7 @@ public class Board {
         r += fact(i)*n;
       }
     }
-    if (r < 0){
-      println(r);
-      println(blocksString(blocks));
-    }
+
     assert(r > 0);
     return r;
     // return reduce(blocks, 7*blocks.length+3, (t, row, col, n) -> t * 23 + n);
@@ -127,12 +124,8 @@ public class Board {
     this.isGoal = isGoal;
     this.hashCode = hashCode;
 
-    assert(rowOfBlank == calcBlank(blocks)[0]);
+    // assert(rowOfBlank == calcBlank(blocks)[0]);
     assert(blocks[rowOfBlank][colOfBlank] == 0);
-  }
-
-  private Board copy(){
-    return new Board(blocks);
   }
 
   static private int[][] copyBlocks(int[][] blocks){
@@ -160,36 +153,6 @@ public class Board {
   public interface CellReduce<T> {
     public T get(T t, int row, int col, int n);
   }
-
-  /*
-     private <T> T reduce(T t, CellReduce<T> ccb){
-     for (int row = 0; row < dimension; row++){
-     for (int col = 0; col < dimension; col++){
-     t = ccb.get(t, row, col, blocks[row][col]);
-     }
-     }
-     return t;
-     }
-
-     private boolean all(CellCallBack<Boolean> ccb){
-     for (int row = 0; row < dimension; row++){
-     for (int col = 0; col < dimension; col++){
-     if (!ccb.get(row, col, blocks[row][col])){
-     return false;
-     }
-     }
-     }
-     return true;
-     }
-     */
-
-  /*
-     private int count(CellCallBack<Boolean> ccb){
-     return reduce(0, (t, row, col, n) ->
-     t + (ccb.get(row, col, n) ? 1 : 0)
-     );
-     }
-     */
 
   static private int correctNumber(int dimension, int row, int col){
     return row==dimension-1 && col==dimension-1 ? 0 : row*dimension+col+1;
@@ -309,17 +272,16 @@ public class Board {
         col = colOfBlank + 1;
         break;
     }
-    int [][] bl = copyBlocks(blocks);
-    assert(bl[row][col] != 0);
-    assert(bl[rowOfBlank][colOfBlank] == 0);
+    int [][] bl = blocks;
     int n = blocks[row][col];
+    assert(n != 0);
+    assert(blocks[rowOfBlank][colOfBlank] == 0);
 
     int prevManhattan = manhattan(n, blocks.length, row, col);
     int prevHamming = hamming(n, blocks.length, row, col);
     exchange(bl, rowOfBlank, colOfBlank, row, col);
     int nextManhattan = manhattan(n, bl.length, rowOfBlank, colOfBlank);
     int nextHamming = hamming(n,  bl.length, rowOfBlank, colOfBlank);
-    // System.out.println(prevManhattan+","+ nextManhattan+","+ manhattan+","+ calcManhattan(bl));
     // assert(manhattan - prevManhattan + nextManhattan == calcManhattan(bl));
     int newManhattan = manhattan - prevManhattan + nextManhattan;
     int newHamming = hamming - prevHamming + nextHamming;
@@ -329,7 +291,7 @@ public class Board {
     Board bd = newBoard(bl, bl.length, row, col, newHamming, newManhattan, newManhattan==0, newHash);
     // Board bd = newBoard(blocks, row, col);
     // Board bd = newBoard(bl, row, col);
-    // exchange(blocks, rowOfBlank, colOfBlank, row, col);
+    exchange(blocks, rowOfBlank, colOfBlank, row, col);
     return bd;
   }
 
@@ -350,7 +312,7 @@ public class Board {
     return hashCode;
   }
 
-  public Iterable<Board> neighbors()     // all neighboring boards
+  public Iterable<Board> neighbors()
   {
     Deque q = new ArrayDeque<Board>();
     if (rowOfBlank > 0){
