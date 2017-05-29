@@ -221,10 +221,13 @@ public class Board {
     return hamming;
   }
 
+  static private int hamming(int n, int dimension, int row, int col){
+    return (n != 0 && correctNumber(dimension, row, col) != n) ? 1 : 0;
+  }
+
   static private int calcHamming(int[][] blocks)                   // number of blocks out of place
   {
-    return count(blocks, (row, col, n) ->
-        (n != 0 && correctNumber(blocks.length, row, col) != n));
+    return count(blocks, (row, col, n) -> hamming(n, blocks.length, row, col)!=0);
   }
 
   static private void println(Object o){
@@ -330,8 +333,13 @@ public class Board {
     int [][] bl = copyBlocks(blocks);
     assert(bl[row][col] != 0);
     assert(bl[rowOfBlank][colOfBlank] == 0);
+    int prevManhattan = manhattan(blocks[row][col], blocks.length, row, col);
     exchange(bl, rowOfBlank, colOfBlank, row, col);
-    Board bd = newBoard(bl, bl.length, row, col, calcHamming(bl), calcManhattan(bl), calcIsGoal(bl), calcHash(bl));
+    int nextManhattan = manhattan(bl[rowOfBlank][colOfBlank], bl.length, rowOfBlank, colOfBlank);
+    System.out.println(prevManhattan+","+ nextManhattan+","+ manhattan+","+ calcManhattan(bl));
+    assert(manhattan - prevManhattan + nextManhattan == calcManhattan(bl));
+    int newManhattan = manhattan - prevManhattan + nextManhattan;
+    Board bd = newBoard(bl, bl.length, row, col, calcHamming(bl), newManhattan, newManhattan==0, calcHash(bl));
     // Board bd = newBoard(blocks, row, col);
     // Board bd = newBoard(bl, row, col);
     // exchange(blocks, rowOfBlank, colOfBlank, row, col);
