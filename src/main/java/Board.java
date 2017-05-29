@@ -31,27 +31,6 @@ public class Board {
     return method.invoke(null, a);
   }
 
-  private static Board newBoard(int [][] blocks, int rowOfBlank, int colOfBlank){
-    if (blocksCache == null){
-      blocksCache = new HashMap<Long, Board>();
-    }
-    long hash = calcHash(blocks);
-    if (blocksCache.containsKey(hash)){
-      return blocksCache.get(hash);
-    }
-
-    Board b = new Board(blocks, blocks.length, rowOfBlank, colOfBlank, calcHamming(blocks), calcManhattan(blocks), calcIsGoal(blocks), hash);
-    Board bd = new Board(blocks);
-    assert(rowOfBlank == b.rowOfBlank);
-    assert(colOfBlank == b.colOfBlank);
-    assert(rowOfBlank == bd.rowOfBlank);
-    assert(colOfBlank == bd.colOfBlank);
-    assert(b.equals(bd));
-    assert(bd.equals(b));
-    // blocksCache.put(hash, bd); return bd;
-    blocksCache.put(hash, b); return b;
-  }
-
   private static Board newBoard(int[][] blocks, int dimension, int rowOfBlank, int colOfBlank, int hamming, int manhattan, boolean isGoal, long hashCode){
     if (blocksCache == null){
       blocksCache = new HashMap<Long, Board>();
@@ -60,7 +39,7 @@ public class Board {
       return blocksCache.get(hashCode);
     }
 
-    Board bd = new Board(blocks, dimension, rowOfBlank, colOfBlank, hamming, manhattan, isGoal, hashCode);
+    Board bd = new Board(copyBlocks(blocks), dimension, rowOfBlank, colOfBlank, hamming, manhattan, isGoal, hashCode);
     blocksCache.put(hashCode, bd);
     return bd;
   }
@@ -134,7 +113,7 @@ public class Board {
   // (where blocks[i][j] = block in row i, column j)
   public Board(int[][] blocks)           // construct a board from an n-by-n array of blocks
   {
-    this(copyBlocks(blocks), blocks.length, calcBlank(blocks)[0], calcBlank(blocks)[1], calcHamming(blocks), calcManhattan(blocks), calcIsGoal(blocks), calcHash(blocks));
+    this(blocks, blocks.length, calcBlank(blocks)[0], calcBlank(blocks)[1], calcHamming(blocks), calcManhattan(blocks), calcIsGoal(blocks), calcHash(blocks));
     // throw error if noBlank
   }
 
@@ -333,21 +312,42 @@ public class Board {
     int [][] bl = copyBlocks(blocks);
     assert(bl[row][col] != 0);
     assert(bl[rowOfBlank][colOfBlank] == 0);
-    int prevManhattan = manhattan(blocks[row][col], blocks.length, row, col);
-    int prevHamming = hamming(blocks[row][col], blocks.length, row, col);
+    int n = blocks[row][col];
+
+    int prevManhattan = manhattan(n, blocks.length, row, col);
+    int prevHamming = hamming(n, blocks.length, row, col);
     exchange(bl, rowOfBlank, colOfBlank, row, col);
-    int nextManhattan = manhattan(bl[rowOfBlank][colOfBlank], bl.length, rowOfBlank, colOfBlank);
-    int nextHamming = hamming(bl[rowOfBlank][colOfBlank], bl.length, rowOfBlank, colOfBlank);
+    int nextManhattan = manhattan(n, bl.length, rowOfBlank, colOfBlank);
+    int nextHamming = hamming(n,  bl.length, rowOfBlank, colOfBlank);
     // System.out.println(prevManhattan+","+ nextManhattan+","+ manhattan+","+ calcManhattan(bl));
     // assert(manhattan - prevManhattan + nextManhattan == calcManhattan(bl));
     int newManhattan = manhattan - prevManhattan + nextManhattan;
     int newHamming = hamming - prevHamming + nextHamming;
-    assert(newHamming == calcHamming(bl));
-    Board bd = newBoard(bl, bl.length, row, col, newHamming, newManhattan, newManhattan==0, calcHash(bl));
+    // assert(newHamming == calcHamming(bl));
+    long newHash = calcHash(hashCode, dimension, n, row, col, rowOfBlank, colOfBlank);
+    // assert(newHash == calcHash(bl));
+    Board bd = newBoard(bl, bl.length, row, col, newHamming, newManhattan, newManhattan==0, newHash);
     // Board bd = newBoard(blocks, row, col);
     // Board bd = newBoard(bl, row, col);
     // exchange(blocks, rowOfBlank, colOfBlank, row, col);
     return bd;
+  }
+
+  static private long calcHash(long hashCode, int dimension, int n, int rowOfBlank, int colOfBlank, int row, int col){
+  /*
+     1 2 6 24
+     0,1,2,3
+     0+2+12+72
+
+     1,0,2,3
+     1+0+12+72
+     */
+
+    int i = row*dimension+col; // 0
+    int j = rowOfBlank*dimension+colOfBlank; // 1
+    hashCode -= fact(j+1)*n; // fact(2)*1
+    hashCode += fact(i+1)*n; // fact(1)*1
+    return hashCode;
   }
 
   public Iterable<Board> neighbors()     // all neighboring boards
