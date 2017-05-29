@@ -1,6 +1,17 @@
 import edu.princeton.cs.algs4.*;
 import java.util.*;
 import java.util.function.*;
+import java.lang.reflect.Method;
+
+class Target {
+  private String aaa() {
+    return "instance method";
+  }
+
+  private static String bbb() {
+    return "static method";
+  }
+}
 
 public class Board {
   private enum Dir{ UP, DOWN, LEFT, RIGHT };
@@ -9,10 +20,37 @@ public class Board {
   private final int[][] blocks;
   private final int rowOfBlank, colOfBlank;
   private final long hashCode;
-  private int tmpRow, tmpCol;
 
   private static Map<Long, Board> blocksCache;
-  private static Board newBoard(int [][] blocks){
+
+  public static Method provideMethod(String methodName, Class targetClass, Class... parameterTypes) throws NoSuchMethodException {
+    Method method = targetClass.getDeclaredMethod(methodName, parameterTypes);
+
+    //Set accessible provide a way to access private methods too
+    method.setAccessible(true);
+
+    return method;
+  }
+
+  static Object fi(String name, int n) throws Throwable{
+    Method method = Board.class.getDeclaredMethod(name, int.class);
+    method.setAccessible(true);
+    return method.invoke(null, n);
+  }
+
+  static Object fii(String name, int n, int m ) throws Throwable{
+    Method method = Board.class.getDeclaredMethod(name, int.class, int.class);
+    method.setAccessible(true);
+    return method.invoke(null, n, m);
+  }
+
+  static Object fa(String name, int[][] a) throws Throwable{
+    Method method = Board.class.getDeclaredMethod(name, int[][].class);
+    method.setAccessible(true);
+    return method.invoke(null, a);
+  }
+
+  private static Board newBoard(int [][] blocks, int rowOfBlank, int colOfBlank){
     if (blocksCache == null){
       blocksCache = new HashMap<Long, Board>();
     }
@@ -21,19 +59,44 @@ public class Board {
       return blocksCache.get(hash);
     }
 
+    Board b = new Board(blocks, blocks.length, rowOfBlank, colOfBlank, calcHamming(blocks), calcManhattan(blocks), calcIsGoal(blocks), hash);
     Board bd = new Board(blocks);
-    blocksCache.put(hash, bd);
+    // println(b); println(bd);
+    assert(rowOfBlank == b.rowOfBlank);
+    assert(colOfBlank == b.colOfBlank);
+    assert(rowOfBlank == bd.rowOfBlank);
+    assert(colOfBlank == bd.colOfBlank);
+    assert(b.equals(bd));
+    assert(bd.equals(b));
+    println(b);
+    println(blocks.length);
+    println(hash);
+    blocksCache.put(hash, bd); return bd;
+    // blocksCache.put(hash, b); return b;
+  }
+
+  private static Board newBoard(int[][] blocks, int dimension, int rowOfBlank, int colOfBlank, int hamming, int manhattan, boolean isGoal, long hashCode){
+    if (blocksCache == null){
+      blocksCache = new HashMap<Long, Board>();
+    }
+    if (blocksCache.containsKey(hashCode)){
+      return blocksCache.get(hashCode);
+    }
+
+    Board bd = new Board(blocks, dimension, rowOfBlank, colOfBlank, hamming, manhattan, isGoal, hashCode);
+    blocksCache.put(hashCode, bd);
     return bd;
   }
 
-  private static int fact(int n){
-    int r = 1;
+  private static long fact(int n){
+    long r = 1;
     for (int i = 1; i <= n; i++)
       r *= i;
     return r;
   }
 
-  private static long calcHash(int [][] blocks){
+  static long calcHash(int [][] blocks){
+
     long r = 0;
     for (int row = 0; row < blocks.length; row++){
       for (int col = 0; col < blocks.length; col++){
@@ -42,6 +105,11 @@ public class Board {
         r += fact(i)*n;
       }
     }
+    if (r < 0){
+      println(r);
+      println(blocksString(blocks));
+    }
+    assert(r > 0);
     return r;
     // return reduce(blocks, 7*blocks.length+3, (t, row, col, n) -> t * 23 + n);
   }
@@ -72,31 +140,24 @@ public class Board {
     return true;
   }
 
-  // (where blocks[i][j] = block in row i, column j)
-  public Board(int[][] blocks)           // construct a board from an n-by-n array of blocks
-  {
-    int c = count(blocks, (row, col, n) -> {
+  static private int[] calcBlank(int[][] blocks){
+    int[] point = new int[2];
+    count(blocks, (row, col, n) -> {
       if (n == 0){
-        this.tmpRow = row;
-        this.tmpCol = col;
+        point[0] = row;
+        point[1] = col;
         return true;
       }
       return false;
     });
 
-    if (c != 1){
-      throw new ArithmeticException();
-    }
+    return point;
+  }
 
-    // Board(copyBlocks(blocks), tmpRow, tmpCol, calcHamming(blocks), calcManhattan(blocks), calcIsGoal(blocks), calcHash(blocks));
-    this.blocks = copyBlocks(blocks);
-    this.dimension = blocks.length;
-    this.rowOfBlank = tmpRow;
-    this.colOfBlank = tmpCol;
-    this.hamming = calcHamming(blocks);
-    this.manhattan = calcManhattan(blocks);
-    this.isGoal = calcIsGoal(blocks);
-    this.hashCode = calcHash(blocks);
+  // (where blocks[i][j] = block in row i, column j)
+  public Board(int[][] blocks)           // construct a board from an n-by-n array of blocks
+  {
+    this(copyBlocks(blocks), blocks.length, calcBlank(blocks)[0], calcBlank(blocks)[1], calcHamming(blocks), calcManhattan(blocks), calcIsGoal(blocks), calcHash(blocks));
     // throw error if noBlank
   }
 
@@ -111,40 +172,11 @@ public class Board {
     this.hashCode = hashCode;
   }
 
-  private Board neighbor(Dir dir){
-    int row=-1;
-    int col=-1;
-
-    switch (dir){
-      case UP:
-        row = rowOfBlank - 1;
-        col = colOfBlank;
-        break;
-      case DOWN:
-        row = rowOfBlank + 1;
-        col = colOfBlank;
-        break;
-      case LEFT:
-        row = rowOfBlank;
-        col = colOfBlank - 1;
-        break;
-      case RIGHT:
-        row = rowOfBlank;
-        col = colOfBlank + 1;
-        break;
-    }
-    // int [][] bl = copyBlocks(blocks, dimension);
-    exchange(blocks, rowOfBlank, colOfBlank, row, col);
-    Board bd = newBoard(blocks);
-    exchange(blocks, rowOfBlank, colOfBlank, row, col);
-    return bd;
-  }
-
   private Board copy(){
     return new Board(blocks);
   }
 
-  private int[][] copyBlocks(int[][] blocks){
+  static private int[][] copyBlocks(int[][] blocks){
     int n = blocks.length;
     int[][] bl = new int[n][n];
     for (int row = 0; row < n; row++){
@@ -171,34 +203,34 @@ public class Board {
   }
 
   /*
-  private <T> T reduce(T t, CellReduce<T> ccb){
-    for (int row = 0; row < dimension; row++){
-      for (int col = 0; col < dimension; col++){
-        t = ccb.get(t, row, col, blocks[row][col]);
-      }
-    }
-    return t;
-  }
+     private <T> T reduce(T t, CellReduce<T> ccb){
+     for (int row = 0; row < dimension; row++){
+     for (int col = 0; col < dimension; col++){
+     t = ccb.get(t, row, col, blocks[row][col]);
+     }
+     }
+     return t;
+     }
 
-  private boolean all(CellCallBack<Boolean> ccb){
-    for (int row = 0; row < dimension; row++){
-      for (int col = 0; col < dimension; col++){
-        if (!ccb.get(row, col, blocks[row][col])){
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-  */
+     private boolean all(CellCallBack<Boolean> ccb){
+     for (int row = 0; row < dimension; row++){
+     for (int col = 0; col < dimension; col++){
+     if (!ccb.get(row, col, blocks[row][col])){
+     return false;
+     }
+     }
+     }
+     return true;
+     }
+     */
 
   /*
-  private int count(CellCallBack<Boolean> ccb){
-    return reduce(0, (t, row, col, n) ->
-        t + (ccb.get(row, col, n) ? 1 : 0)
-        );
-  }
-  */
+     private int count(CellCallBack<Boolean> ccb){
+     return reduce(0, (t, row, col, n) ->
+     t + (ccb.get(row, col, n) ? 1 : 0)
+     );
+     }
+     */
 
   static private int correctNumber(int dimension, int row, int col){
     return row==dimension-1 && col==dimension-1 ? 0 : row*dimension+col+1;
@@ -215,7 +247,7 @@ public class Board {
         (n != 0 && correctNumber(blocks.length, row, col) != n));
   }
 
-  private void println(Object o){
+  static private void println(Object o){
     System.out.println(o);
   }
 
@@ -276,6 +308,14 @@ public class Board {
     if (other == null) return false;
     if (other.getClass() != this.getClass()) return false;
     Board that = (Board) other;
+    if (hashCode == that.hashCode){
+      // println("" + rowOfBlank +", "+ that.rowOfBlank);
+      assert(rowOfBlank == that.rowOfBlank);
+      assert(colOfBlank == that.colOfBlank);
+      assert(hamming == that.hamming);
+      assert(manhattan == that.manhattan);
+      assert(isGoal == that.isGoal);
+    }
     return hashCode == that.hashCode;
   }
 
@@ -283,6 +323,37 @@ public class Board {
     int tmp = bl[row1][col1];
     bl[row1][col1] = bl[row2][col2];
     bl[row2][col2] = tmp;
+  }
+
+  private Board neighbor(Dir dir){
+    int row=-1;
+    int col=-1;
+
+    switch (dir){
+      case UP:
+        row = rowOfBlank - 1;
+        col = colOfBlank;
+        break;
+      case DOWN:
+        row = rowOfBlank + 1;
+        col = colOfBlank;
+        break;
+      case LEFT:
+        row = rowOfBlank;
+        col = colOfBlank - 1;
+        break;
+      case RIGHT:
+        row = rowOfBlank;
+        col = colOfBlank + 1;
+        break;
+    }
+    // int [][] bl = copyBlocks(blocks, dimension);
+    exchange(blocks, rowOfBlank, colOfBlank, row, col);
+    // Board bd = newBoard(blocks, dimension, row, col, calcHamming(blocks), calcManhattan(blocks), calcIsGoal(blocks), calcHash(blocks));
+    // Board bd = newBoard(blocks, row, col);
+    Board bd = newBoard(blocks, row, col);
+    exchange(blocks, rowOfBlank, colOfBlank, row, col);
+    return bd;
   }
 
   public Iterable<Board> neighbors()     // all neighboring boards
@@ -303,17 +374,21 @@ public class Board {
     return q;
   }
 
-  public String toString()               // string representation of this board (in the output format specified below)
-  {
+  static String blocksString(int[][] blocks){
     StringBuilder s = new StringBuilder();
-    s.append(dimension + "\n");
+    s.append(blocks.length + "\n");
     s = reduce(blocks, s, (s_, row, col, n)->{
       s_.append(String.format("%2d ", n));
-      if (col == dimension-1){
+      if (col == blocks.length-1){
         s_.append("\n");
       }
       return s_;
     });
     return s.toString();
+  }
+
+  public String toString()               // string representation of this board (in the output format specified below)
+  {
+    return blocksString(blocks);
   }
 }

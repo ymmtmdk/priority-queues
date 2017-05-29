@@ -35,7 +35,7 @@ object Util{
     return board(inf)
   }
 
-  fun board(inf: In): Board{
+  fun blocks(inf: In): Array<IntArray>{
     val n = inf.readInt()
     val blocks = Array<IntArray>(n){ IntArray(n){0}}
 
@@ -44,25 +44,45 @@ object Util{
         blocks[i][j] = inf.readInt()
       }
     }
+    return blocks
+  }
 
-    return Board(blocks)
+  fun blocks(src: String): Array<IntArray>{
+    val inf = In(java.util.Scanner(src))
+    val n = inf.readInt()
+    val blocks = Array<IntArray>(n){ IntArray(n){0}}
+
+    for (i in 0..n-1){
+      for (j in 0..n-1){
+        blocks[i][j] = inf.readInt()
+      }
+    }
+    return blocks
+  }
+
+  fun board(inf: In): Board{
+    return Board(blocks(inf))
   }
 
   fun solver(inf: In): Solver{
+    /* doPrivateMethod(Board::class, "fact", 1) */
     return Solver(board(inf))
   }
 
-  fun doPrivateMethod(target: Any, field: String): Any{
+  fun doPrivateMethod(target: Any, field: String, n: Int): Any{
     /*
     val c = Util.javaClass
     val method = c.getDeclaredMethod("f")
     method.setAccessible(true)
     method.invoke(Util)
+      java.lang.reflect.Method method = Board.class.getMethod(name, int.class);
+      method.setAccessible(true);
+      method.invoke(null, n);
     */
     val c = target.javaClass
-    val method = c.getMethod(field)
+    val method = c.getMethod(field, Int.javaClass)
     method.setAccessible(true)
-    return method.invoke(target)
+    return method.invoke(null, n)
   }
 
   private fun f(){
@@ -82,6 +102,14 @@ class TestBoard{
   8 1 3
   4 0 2
   7 6 5
+  """
+
+  val board3 = """
+  4
+  1 2 3 4
+  5 6 7 8
+  9 10 11 12
+  13 14 15 0
   """
 
   @Test fun testToString(){
@@ -112,6 +140,12 @@ class TestBoard{
     assertEquals(true, Util.board(board1).isGoal())
     assertEquals(false, Util.board(board2).isGoal())
   }
+
+  @Test fun testHashCode(){
+    /* Board.fa("calcHash", Util.blocks(board1)) */
+    assertEquals(23, Board.calcHash(Util.blocks(board1)))
+    assertEquals(20922789887999, Board.calcHash(Util.blocks(board3)))
+  }
 }
 
 class TestSolver{
@@ -125,9 +159,11 @@ class TestSolver{
     for (n in 1..6){
       assertEquals(n, Util.solver(In("8puzzle/puzzle3x3-%02d.txt".format(n))).moves())
     }
-    for (n in 1..22){
+    for (n in 1..2){
       assertEquals(n, Util.solver(In("8puzzle/puzzle4x4-%02d.txt".format(n))).moves())
     }
+    println(Board.fi("fact", 10))
+    println(Board.fi("fact", 10))
   }
 
   @Test fun callMain(){
