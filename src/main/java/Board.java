@@ -55,13 +55,31 @@ public class Board {
     return t;
   }
 
+  static private int count(int[][] bl, CellCallBack<Boolean> ccb){
+    return reduce(bl, 0, (t, row, col, n) ->
+        t + (ccb.get(row, col, n) ? 1 : 0)
+        );
+  }
+
+  static private boolean all(int[][] bl, CellCallBack<Boolean> ccb){
+    for (int row = 0; row < bl.length; row++){
+      for (int col = 0; col < bl.length; col++){
+        if (!ccb.get(row, col, bl[row][col])){
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+
   // (where blocks[i][j] = block in row i, column j)
   public Board(int[][] blocks)           // construct a board from an n-by-n array of blocks
   {
     this.dimension = blocks.length;
     this.blocks = copyBlocks(blocks, dimension);
 
-    int c = count((row, col, n) -> {
+    int c = count(blocks, (row, col, n) -> {
       if (n == 0){
         this.tmpRow = row;
         this.tmpCol = col;
@@ -75,9 +93,9 @@ public class Board {
     }
     this.rowOfBlank = tmpRow;
     this.colOfBlank = tmpCol;
-    this.hamming = calcHamming();
-    this.manhattan = calcManhattan();
-    this.isGoal = calcIsGoal();
+    this.hamming = calcHamming(blocks);
+    this.manhattan = calcManhattan(blocks);
+    this.isGoal = calcIsGoal(blocks);
     this.hashCode = calcHash(blocks);
     // throw error if noBlank
   }
@@ -140,6 +158,7 @@ public class Board {
     public T get(T t, int row, int col, int n);
   }
 
+  /*
   private <T> T reduce(T t, CellReduce<T> ccb){
     for (int row = 0; row < dimension; row++){
       for (int col = 0; col < dimension; col++){
@@ -159,14 +178,17 @@ public class Board {
     }
     return true;
   }
+  */
 
+  /*
   private int count(CellCallBack<Boolean> ccb){
     return reduce(0, (t, row, col, n) ->
         t + (ccb.get(row, col, n) ? 1 : 0)
         );
   }
+  */
 
-  private int correctNumber(int row, int col){
+  static private int correctNumber(int dimension, int row, int col){
     return row==dimension-1 && col==dimension-1 ? 0 : row*dimension+col+1;
   }
 
@@ -175,10 +197,10 @@ public class Board {
     return hamming;
   }
 
-  private int calcHamming()                   // number of blocks out of place
+  static private int calcHamming(int[][] blocks)                   // number of blocks out of place
   {
-    return count((row, col, n) ->
-        (n != 0 && correctNumber(row, col) != n));
+    return count(blocks, (row, col, n) ->
+        (n != 0 && correctNumber(blocks.length, row, col) != n));
   }
 
   private void println(Object o){
@@ -194,13 +216,13 @@ public class Board {
        row = 0
        col = 0
        return 3
-         n = 8-1
-         correct row of 7 -> 2
-           n / 3
-         correct col of 7 -> 1
-           n % 3
+       n = 8-1
+       correct row of 7 -> 2
+       n / 3
+       correct col of 7 -> 1
+       n % 3
 
-       */
+*/
     if (n == 0){
       return 0;
     }
@@ -212,9 +234,9 @@ public class Board {
     return Math.abs(row-correntRowOfN)+Math.abs(col-correntColOfN);
   }
 
-  private int calcManhattan()                 // sum of Manhattan distances between blocks and goal
+  static private int calcManhattan(int[][] blocks)                 // sum of Manhattan distances between blocks and goal
   {
-    return reduce(0, (t, row, col, n) -> t + manhattan(n, dimension, row, col));
+    return reduce(blocks, 0, (t, row, col, n) -> t + manhattan(n, blocks.length, row, col));
   }
 
   public int manhattan()                 // sum of Manhattan distances between blocks and goal
@@ -222,8 +244,8 @@ public class Board {
     return manhattan;
   }
 
-  private boolean calcIsGoal(){
-    return all((row, col, n) -> correctNumber(row, col) == n);
+  static private boolean calcIsGoal(int[][] blocks){
+    return all(blocks, (row, col, n) -> correctNumber(blocks.length, row, col) == n);
   }
 
   public boolean isGoal()                // is this board the goal board?
@@ -274,7 +296,7 @@ public class Board {
   {
     StringBuilder s = new StringBuilder();
     s.append(dimension + "\n");
-    s = reduce(s, (s_, row, col, n)->{
+    s = reduce(blocks, s, (s_, row, col, n)->{
       s_.append(String.format("%2d ", n));
       if (col == dimension-1){
         s_.append("\n");
