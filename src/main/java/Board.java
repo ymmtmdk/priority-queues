@@ -3,16 +3,6 @@ import java.util.*;
 import java.util.function.*;
 import java.lang.reflect.Method;
 
-class Target {
-  private String aaa() {
-    return "instance method";
-  }
-
-  private static String bbb() {
-    return "static method";
-  }
-}
-
 public class Board {
   private enum Dir{ UP, DOWN, LEFT, RIGHT };
   private final int dimension, manhattan, hamming;
@@ -22,15 +12,6 @@ public class Board {
   private final long hashCode;
 
   private static Map<Long, Board> blocksCache;
-
-  public static Method provideMethod(String methodName, Class targetClass, Class... parameterTypes) throws NoSuchMethodException {
-    Method method = targetClass.getDeclaredMethod(methodName, parameterTypes);
-
-    //Set accessible provide a way to access private methods too
-    method.setAccessible(true);
-
-    return method;
-  }
 
   static Object fi(String name, int n) throws Throwable{
     Method method = Board.class.getDeclaredMethod(name, int.class);
@@ -61,18 +42,14 @@ public class Board {
 
     Board b = new Board(blocks, blocks.length, rowOfBlank, colOfBlank, calcHamming(blocks), calcManhattan(blocks), calcIsGoal(blocks), hash);
     Board bd = new Board(blocks);
-    // println(b); println(bd);
     assert(rowOfBlank == b.rowOfBlank);
     assert(colOfBlank == b.colOfBlank);
     assert(rowOfBlank == bd.rowOfBlank);
     assert(colOfBlank == bd.colOfBlank);
     assert(b.equals(bd));
     assert(bd.equals(b));
-    println(b);
-    println(blocks.length);
-    println(hash);
-    blocksCache.put(hash, bd); return bd;
-    // blocksCache.put(hash, b); return b;
+    // blocksCache.put(hash, bd); return bd;
+    blocksCache.put(hash, b); return b;
   }
 
   private static Board newBoard(int[][] blocks, int dimension, int rowOfBlank, int colOfBlank, int hamming, int manhattan, boolean isGoal, long hashCode){
@@ -170,6 +147,9 @@ public class Board {
     this.manhattan = manhattan;
     this.isGoal = isGoal;
     this.hashCode = hashCode;
+
+    assert(rowOfBlank == calcBlank(blocks)[0]);
+    assert(blocks[rowOfBlank][colOfBlank] == 0);
   }
 
   private Board copy(){
@@ -326,8 +306,8 @@ public class Board {
   }
 
   private Board neighbor(Dir dir){
-    int row=-1;
-    int col=-1;
+    int row=-100;
+    int col=-100;
 
     switch (dir){
       case UP:
@@ -347,12 +327,14 @@ public class Board {
         col = colOfBlank + 1;
         break;
     }
-    // int [][] bl = copyBlocks(blocks, dimension);
-    exchange(blocks, rowOfBlank, colOfBlank, row, col);
-    // Board bd = newBoard(blocks, dimension, row, col, calcHamming(blocks), calcManhattan(blocks), calcIsGoal(blocks), calcHash(blocks));
+    int [][] bl = copyBlocks(blocks);
+    assert(bl[row][col] != 0);
+    assert(bl[rowOfBlank][colOfBlank] == 0);
+    exchange(bl, rowOfBlank, colOfBlank, row, col);
+    Board bd = newBoard(bl, bl.length, row, col, calcHamming(bl), calcManhattan(bl), calcIsGoal(bl), calcHash(bl));
     // Board bd = newBoard(blocks, row, col);
-    Board bd = newBoard(blocks, row, col);
-    exchange(blocks, rowOfBlank, colOfBlank, row, col);
+    // Board bd = newBoard(bl, row, col);
+    // exchange(blocks, rowOfBlank, colOfBlank, row, col);
     return bd;
   }
 
