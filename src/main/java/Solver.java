@@ -17,7 +17,7 @@ public class Solver {
       // For each node, which node it can most efficiently be reached from.
       // If a node can be reached from many nodes, cameFrom will eventually contain the
       // most efficient previous step.
-      Map<BoardNode, BoardNode> cameFrom = new TreeMap<BoardNode, BoardNode>(); //the empty map
+      // Map<BoardNode, BoardNode> cameFrom = new TreeMap<BoardNode, BoardNode>(); //the empty map
 
       // For each node, the cost of getting from the start node to that node.
       Map<BoardNode, Integer> gScore = new TreeMap<BoardNode, Integer>(); //map with default value of Infinity
@@ -32,7 +32,7 @@ public class Solver {
       while (!openSet.isEmpty()){
         BoardNode current = openSet.poll(); //the node in openSet having the lowest fScore[] value
         if (current.equals(goal))
-          return reconstruct_path(cameFrom, current);
+          return reconstruct_path(current);
 
         // openSet.Remove(current)
         closedSet.add(current);
@@ -50,7 +50,7 @@ public class Solver {
           }
 
           // This path is the best until now. Record it!
-          cameFrom.put(neighbor, current);
+          // cameFrom.put(neighbor, current);
           gScore.put(neighbor, tentative_gScore);
           fScore.put(neighbor, gScore.get(neighbor) + heuristic_cost_estimate(neighbor, goal));
           // return 0;
@@ -60,14 +60,11 @@ public class Solver {
       return null;
     }
 
-    Deque<BoardNode> reconstruct_path(Map<BoardNode, BoardNode> cameFrom, BoardNode current){
+    Deque<BoardNode> reconstruct_path(BoardNode current){
       Deque<BoardNode> total_path = new ArrayDeque<BoardNode>();
       total_path.push(current);
-      // total_path := [current]
-      while (cameFrom.containsKey(current)){
-        // while current in cameFrom.Keys:
-        current = cameFrom.get(current);
-        // current := cameFrom[current]
+      while (current.prevNode() != null){
+        current = current.prevNode();
         total_path.add(current);
       }
       return total_path;
@@ -81,11 +78,13 @@ public class Solver {
   private static int _node_id;
 
   private class BoardNode implements Comparable<BoardNode>{
-
     private final Board board;
     private final int moves;
     private final int id;
-    BoardNode(Board board, int moves){
+    private final BoardNode prevNode;
+
+    public BoardNode(BoardNode prevNode, Board board, int moves){
+      this.prevNode = prevNode;
       this.board = board;
       this.id = _node_id++;
       this.moves = moves;
@@ -94,7 +93,7 @@ public class Solver {
       }
     }
 
-    Board goal(){
+    private Board goal(){
       int n = board.dimension();
       int[][] blocks = new int[n][n];
       // Board initial = new Board(blocks);
@@ -108,10 +107,14 @@ public class Solver {
       return new Board(blocks);
     }
 
+    public BoardNode prevNode(){
+      return prevNode;
+    }
+
     public Iterable<BoardNode> neighbors(){
       Deque<BoardNode> q = new ArrayDeque<BoardNode>();
       for (Board bd : board.neighbors()){
-        q.add(new BoardNode(bd, moves+1));
+        q.add(new BoardNode(this, bd, moves+1));
       }
       return q;
     }
@@ -158,9 +161,9 @@ public class Solver {
 
     Deque<BoardNode> result;
     AStarSolver(Board start){
-      BoardNode bn = new BoardNode(start, 0);
+      BoardNode bn = new BoardNode(null, start, 0);
 
-      result = aStar(bn, new BoardNode(bn.goal(), 0));
+      result = aStar(bn, new BoardNode(null, bn.goal(), 0));
     }
   }
 
