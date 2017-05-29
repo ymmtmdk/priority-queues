@@ -29,10 +29,7 @@ class TestPQ{
   }
 }
 
-class TestBoard{
-  @Test fun test(){
-  }
-
+object Util{
   fun board(src: String): Board{
     val inf = In(java.util.Scanner(src))
     return board(inf)
@@ -54,6 +51,21 @@ class TestBoard{
   fun solver(inf: In): Solver{
     return Solver(board(inf))
   }
+}
+
+class TestBoard{
+  val board1 = """
+  2
+  1  2
+  3  0
+  """
+
+  val board2 = """
+  3
+  8 1 3
+  4 0 2
+  7 6 5
+  """
 
   @Test fun testToString(){
     /* val brd = board(simpleBoard()) */
@@ -62,52 +74,43 @@ class TestBoard{
   }
 
   @Test fun testEquals(){
-    val b1 = board(simpleBoard())
-    val b2 = board(simpleBoard())
+    val b1 = Util.board(board1)
+    val b2 = Util.board(board1)
     assertEquals(b1, b2)
     assertNotEquals(b1, null)
     assertNotEquals(b1, 1)
   }
 
-  fun simpleBoard(): String{
-    val src = """
-    2
-    1  2
-    3  0
-    """
-    return src
-  }
-
   @Test fun testHamming(){
-    val src = """
-    3
-    8 1 3
-    4 0 2
-    7 6 5
-    """
-
-    val brd = board(src)
-    assertEquals(0, board(simpleBoard()).hamming())
-    assertEquals(5, brd.hamming())
-
+    assertEquals(0, Util.board(board1).hamming())
+    assertEquals(5, Util.board(board2).hamming())
   }
+  @Test fun testManhattan(){
+    assertEquals(0, Board.manhattan(1,2,0,0))
+    assertEquals(1, Board.manhattan(2,2,0,0))
+    assertEquals(0, Util.board(board1).manhattan())
+    assertEquals(10, Util.board(board2).manhattan())
+  }
+
   @Test fun testIsGoard(){
-    val brd = board(simpleBoard())
-    assertEquals(true, brd.isGoal())
+    assertEquals(true, Util.board(board1).isGoal())
+    assertEquals(false, Util.board(board2).isGoal())
   }
+}
 
+class TestSolver{
   @Test fun testSolver(){
-    val sl = solver(In("8puzzle/puzzle2x2-00.txt"))
+    val sl = Util.solver(In("8puzzle/puzzle2x2-00.txt"))
     assertEquals(true, sl.isSolvable())
     assertEquals(0, sl.moves())
     for (n in 1..6){
-      assertEquals(n, solver(In("8puzzle/puzzle2x2-%02d.txt".format(n))).moves())
+      assertEquals(n, Util.solver(In("8puzzle/puzzle2x2-%02d.txt".format(n))).moves())
     }
     for (n in 1..6){
-      assertEquals(n, solver(In("8puzzle/puzzle3x3-%02d.txt".format(n))).moves())
+      assertEquals(n, Util.solver(In("8puzzle/puzzle3x3-%02d.txt".format(n))).moves())
     }
     for (n in 1..16){
-      assertEquals(n, solver(In("8puzzle/puzzle4x4-%02d.txt".format(n))).moves())
+      assertEquals(n, Util.solver(In("8puzzle/puzzle4x4-%02d.txt".format(n))).moves())
     }
   }
 

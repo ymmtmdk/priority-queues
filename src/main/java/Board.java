@@ -181,7 +181,11 @@ public class Board {
         (n != 0 && correctNumber(row, col) != n));
   }
 
-  private int manhattan(int row, int col){
+  private void println(Object o){
+    System.out.println(o);
+  }
+
+  static int manhattan(int n, int dimension, int row, int col){
     /*
        8 1 3
        4   2
@@ -190,25 +194,27 @@ public class Board {
        row = 0
        col = 0
        return 3
-         n = 8
-         correct row of 8 -> 2
+         n = 8-1
+         correct row of 7 -> 2
            n / 3
-         correct col of 8 -> 1
+         correct col of 7 -> 1
            n % 3
 
        */
-    int n = blocks[row][col];
+    if (n == 0){
+      return 0;
+    }
 
     //TODO compare to goal?
-    int correntRowOfN = n / dimension;
-    int correntColOfN = n % dimension;
+    int correntRowOfN = (n-1) / dimension;
+    int correntColOfN = (n-1) % dimension;
 
-    return Math.abs(row-correntColOfN)+Math.abs(col-correntColOfN);
+    return Math.abs(row-correntRowOfN)+Math.abs(col-correntColOfN);
   }
 
   private int calcManhattan()                 // sum of Manhattan distances between blocks and goal
   {
-    return reduce(0, (t, row, col, n) -> t + manhattan(row, col));
+    return reduce(0, (t, row, col, n) -> t + manhattan(n, dimension, row, col));
   }
 
   public int manhattan()                 // sum of Manhattan distances between blocks and goal
