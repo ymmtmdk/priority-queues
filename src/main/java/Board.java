@@ -178,7 +178,7 @@ public class Board {
   private int calcHamming()                   // number of blocks out of place
   {
     return count((row, col, n) ->
-        !(n != 0 && correctNumber(row, col) == n));
+        (n != 0 && correctNumber(row, col) != n));
   }
 
   private int manhattan(int row, int col){
