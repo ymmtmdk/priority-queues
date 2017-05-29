@@ -87,18 +87,15 @@ class TestBoard{
     val sl = solver(In("8puzzle/puzzle2x2-00.txt"))
     assertEquals(true, sl.isSolvable())
     assertEquals(0, sl.moves())
-    assertEquals(1, solver(In("8puzzle/puzzle2x2-01.txt")).moves())
-    assertEquals(2, solver(In("8puzzle/puzzle2x2-02.txt")).moves())
-    assertEquals(3, solver(In("8puzzle/puzzle2x2-03.txt")).moves())
-    assertEquals(4, solver(In("8puzzle/puzzle2x2-04.txt")).moves())
-    assertEquals(4, solver(In("8puzzle/puzzle3x3-04.txt")).moves())
-    assertEquals(4, solver(In("8puzzle/puzzle4x4-04.txt")).moves())
-    assertEquals(8, solver(In("8puzzle/puzzle4x4-08.txt")).moves())
-    assertEquals(9, solver(In("8puzzle/puzzle4x4-09.txt")).moves())
-    assertEquals(10, solver(In("8puzzle/puzzle4x4-10.txt")).moves())
-    assertEquals(12, solver(In("8puzzle/puzzle4x4-12.txt")).moves())
-    assertEquals(13, solver(In("8puzzle/puzzle4x4-13.txt")).moves())
-    assertEquals(14, solver(In("8puzzle/puzzle4x4-14.txt")).moves())
+    for (n in 1..6){
+      assertEquals(n, solver(In("8puzzle/puzzle2x2-%02d.txt".format(n))).moves())
+    }
+    for (n in 1..6){
+      assertEquals(n, solver(In("8puzzle/puzzle3x3-%02d.txt".format(n))).moves())
+    }
+    for (n in 1..16){
+      assertEquals(n, solver(In("8puzzle/puzzle4x4-%02d.txt".format(n))).moves())
+    }
   }
 
   @Test fun callMain(){
