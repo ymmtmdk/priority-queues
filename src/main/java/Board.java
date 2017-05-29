@@ -26,8 +26,24 @@ public class Board {
     return bd;
   }
 
+  private static int fact(int n){
+    int r = 1;
+    for (int i = 1; i <= n; i++)
+      r *= i;
+    return r;
+  }
+
   private static int calcHash(int [][] blocks){
-    return reduce(blocks, 7*blocks.length+3, (t, row, col, n) -> t * 23 + n);
+    int r = 0;
+    for (int row = 0; row < blocks.length; row++){
+      for (int col = 0; col < blocks.length; col++){
+        int i = row*blocks.length+col+1;
+        int n = blocks[row][col];
+        r += fact(i)*n;
+      }
+    }
+    return r;
+    // return reduce(blocks, 7*blocks.length+3, (t, row, col, n) -> t * 23 + n);
   }
 
   private static <T> T reduce(int [][] bl, T t, CellReduce<T> ccb){
@@ -224,8 +240,7 @@ public class Board {
     if (other == null) return false;
     if (other.getClass() != this.getClass()) return false;
     Board that = (Board) other;
-    if (hashCode != that.hashCode) return false;
-    return all((row, col, n) -> that.blocks[row][col] == n);
+    return hashCode == that.hashCode;
   }
 
   private void exchange(int [][] bl, int row1, int col1, int row2 ,int col2){

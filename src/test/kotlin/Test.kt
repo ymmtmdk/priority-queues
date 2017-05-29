@@ -97,6 +97,8 @@ class TestBoard{
     assertEquals(9, solver(In("8puzzle/puzzle4x4-09.txt")).moves())
     assertEquals(10, solver(In("8puzzle/puzzle4x4-10.txt")).moves())
     assertEquals(12, solver(In("8puzzle/puzzle4x4-12.txt")).moves())
+    assertEquals(13, solver(In("8puzzle/puzzle4x4-13.txt")).moves())
+    assertEquals(14, solver(In("8puzzle/puzzle4x4-14.txt")).moves())
   }
 
   @Test fun callMain(){
