@@ -151,8 +151,9 @@ class TestBoard{
 class TestSolver{
   @Test fun testTwin(){
     val bd = Util.board(In("8puzzle/puzzle2x2-00.txt"))
-    /* val tw = bd.twin() */
-    /* assertNotEquals(bd, tw) */
+    val tw = bd.twin()
+    assertEquals(tw, tw)
+    assertNotEquals(bd, tw)
     /* assertEquals(false, sl.isSolvable()) */
   }
 

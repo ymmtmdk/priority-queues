@@ -301,11 +301,14 @@ public class Board {
       col2 = 1;
     }
 
+    assert(blocks.get(row1, col1) != 0);
+    assert(blocks.get(row2, col2) != 0);
+    return exBoard(rowOfBlank, colOfBlank, row1, col1, row2, col2);
     // exchange(blocks, row1, col1, row2, col2);
     // Board bd = new Board(blocks);
     // exchange(blocks, row1, col1, row2, col2);
     // return bd;
-    return null;
+    // return null;
   }
 
   public boolean equals(Object other)        // does this board equal y?
