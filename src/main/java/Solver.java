@@ -44,22 +44,25 @@ public class Solver {
 
     Deque<BoardNode> aStar(BoardNode start, BoardNode goal){
       PriorityQueue<BoardNode> closedSet = new PriorityQueue<BoardNode>();
-      PriorityQueue<BoardNode> openSet = new PriorityQueue<BoardNode>();
+      // PriorityQueue<BoardNode> openSet = new PriorityQueue<BoardNode>();
       MinPQ<BoardNode> q = new MinPQ<BoardNode>();
-      openSet.add(start);
+      // openSet.add(start);
       q.insert(start);
 
       while (!q.isEmpty()){
-        BoardNode item = openSet.poll();
+        // BoardNode item = openSet.poll();
         BoardNode current = q.delMin();
         if (current.board.equals(goal.board))
           return path(current);
 
         closedSet.add(current);
         for (BoardNode neighbor : current.neighbors()){
-          if (!closedSet.contains(neighbor) && !openSet.contains(neighbor)){
-            openSet.add(neighbor);
-            q.insert(neighbor);
+          // if (!closedSet.contains(neighbor) && !openSet.contains(neighbor)){
+          if (!closedSet.contains(neighbor)){
+            if (current.prevNode() == null || !current.prevNode().board.equals(neighbor.board)){
+              // openSet.add(neighbor);
+              q.insert(neighbor);
+            }
           }
         }
       }
