@@ -6,6 +6,42 @@ public class Solver {
     abstract int heuristic_cost_estimate(BoardNode start, BoardNode goal);
     abstract int dist_between(BoardNode current, BoardNode neighbor);
 
+    Deque<BoardNode> aStar4(BoardNode start, BoardNode goal){
+      PriorityQueue<BoardNode> closedSet = new PriorityQueue<BoardNode>();
+      PriorityQueue<BoardNode> closedSet2 = new PriorityQueue<BoardNode>();
+      MinPQ<BoardNode> q = new MinPQ<BoardNode>();
+      MinPQ<BoardNode> q2 = new MinPQ<BoardNode>();
+      q.insert(start);
+      q2.insert(goal);
+
+      while (!q.isEmpty()){
+        BoardNode current = q.delMin();
+        BoardNode current2 = q2.delMin();
+        if (current.board.equals(goal.board))
+          return path(current);
+
+        closedSet.add(current);
+        closedSet2.add(current2);
+
+        if (closedSet.contains(current2) || closedSet2.contains(current)){
+          return path(current, current2);
+        }
+
+        for (BoardNode neighbor : current.neighbors()){
+          if (!closedSet.contains(neighbor)){
+            q.insert(neighbor);
+          }
+        }
+        for (BoardNode neighbor : current2.neighbors()){
+          if (!closedSet2.contains(neighbor)){
+            q2.insert(neighbor);
+          }
+        }
+      }
+
+      return null;
+    }
+
     Deque<BoardNode> aStar(BoardNode start, BoardNode goal){
       PriorityQueue<BoardNode> closedSet = new PriorityQueue<BoardNode>();
       PriorityQueue<BoardNode> openSet = new PriorityQueue<BoardNode>();
@@ -31,6 +67,23 @@ public class Solver {
       return null;
     }
 
+    Deque<BoardNode> path(BoardNode current, BoardNode current2){
+      BoardNode current22 = current2;
+      Deque<BoardNode> total_path = new ArrayDeque<BoardNode>();
+      total_path.addFirst(current2);
+      while (current2.prevNode() != null){
+        current2 = current2.prevNode();
+        total_path.addFirst(current2);
+      }
+      if (!current.board.equals(current22.board)){
+        total_path.addLast(current);
+      }
+      while (current.prevNode() != null){
+        current = current.prevNode();
+        total_path.addLast(current);
+      }
+      return total_path;
+    }
     Deque<BoardNode> path(BoardNode current){
       Deque<BoardNode> total_path = new ArrayDeque<BoardNode>();
       total_path.push(current);
@@ -110,12 +163,12 @@ public class Solver {
       return true;
     }
     public String toString(){
-    StringBuilder s = new StringBuilder();
-    s.append("priority  = " + priority() + "\n");
-    s.append("moves     = " + moves + "\n");
-    s.append("manhattan = " + board.manhattan() + "\n");
-    s.append(board.toString());
-    return s.toString();
+      StringBuilder s = new StringBuilder();
+      s.append("priority  = " + priority() + "\n");
+      s.append("moves     = " + moves + "\n");
+      s.append("manhattan = " + board.manhattan() + "\n");
+      s.append(board.toString());
+      return s.toString();
     }
   }
 

@@ -48,6 +48,7 @@ public class Board {
     // return reduce(blocks, 7*blocks.length+3, (t, row, col, n) -> t * 23 + n);
   }
 
+
   private static <T> T reduce(int [][] bl, T t, CellReduce<T> ccb){
     for (int row = 0; row < bl.length; row++){
       for (int col = 0; col < bl.length; col++){

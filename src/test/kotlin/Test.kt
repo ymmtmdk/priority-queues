@@ -167,6 +167,7 @@ class TestSolver{
   @Test fun callMain(){
     Solver.main(arrayOf("8puzzle/puzzle2x2-00.txt"))
     Solver.main(arrayOf("8puzzle/puzzle2x2-01.txt"))
+    Solver.main(arrayOf("8puzzle/puzzle2x2-02.txt"))
     Solver.main(arrayOf("8puzzle/puzzle3x3-00.txt"))
     Solver.main(arrayOf("8puzzle/puzzle04.txt"))
     Solver.main(arrayOf("8puzzle/puzzle4x4-01.txt"))
