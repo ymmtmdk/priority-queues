@@ -154,7 +154,8 @@ class TestSolver{
     val tw = bd.twin()
     assertEquals(tw, tw)
     assertNotEquals(bd, tw)
-    /* assertEquals(false, sl.isSolvable()) */
+    val sl = Solver(tw);
+    assertEquals(false, sl.isSolvable())
   }
 
   @Test fun testSolver(){

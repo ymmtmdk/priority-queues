@@ -56,29 +56,21 @@ public class Solver {
       // openSet.add(start);
       q.insert(start);
 
-      int c = 0;
-      int io = 0;
       while (!q.isEmpty()){
         // BoardNode item = openSet.poll();
         BoardNode current = q.delMin();
-        c += 1;
-        // println("----------:"+c+":"+io);
         if (current.board.equals(goal.board))
           return path(current);
         if (current.board.equals(goal2.board))
           return null;
 
-        // println(current);
-        // println("neighbor");
         closedSet.add(current);
         for (BoardNode neighbor : current.neighbors()){
           // if (!closedSet.contains(neighbor) && !openSet.contains(neighbor)){
           if (!closedSet.contains(neighbor)){
             if (current.prevNode() == null || !current.prevNode().board.equals(neighbor.board)){
               // openSet.add(neighbor);
-              // println(neighbor);
               q.insert(neighbor);
-              io += 1;
             }
           }
         }
@@ -227,9 +219,9 @@ public class Solver {
     AStarSolver(Board start){
       BoardNode bd = new BoardNode(null, start, 0);
       BoardNode gl = new BoardNode(null, goal(start), 0);
-      // BoardNode gl2 = new BoardNode(null, goal(start).twin(), 0);
+      BoardNode gl2 = new BoardNode(null, goal(start).twin(), 0);
 
-      result = aStar(bd, gl);
+      result = aStar5(bd, gl, gl2);
     }
   }
 
