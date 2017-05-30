@@ -32,7 +32,7 @@ public class Solver {
       while (!openSet.isEmpty()){
         BoardNode current = openSet.poll(); //the node in openSet having the lowest fScore[] value
         if (current.equals(goal))
-          return reconstruct_path(current);
+          return path(current);
 
         // openSet.Remove(current)
         closedSet.add(current);
@@ -53,31 +53,6 @@ public class Solver {
           // cameFrom.put(neighbor, current);
           gScore.put(neighbor, tentative_gScore);
           fScore.put(neighbor, gScore.get(neighbor) + heuristic_cost_estimate(neighbor, goal));
-          // return 0;
-        }
-      }
-
-      return null;
-    }
-
-    Deque<BoardNode> aStar2(BoardNode start, BoardNode goal){
-      MinPQ<BoardNode> q = new MinPQ<BoardNode>();
-      Set<BoardNode> closedSet = new TreeSet<BoardNode>();
-      q.insert(start);
-      // set.add(start);
-
-      while (!q.isEmpty()){
-        BoardNode current = q.delMin(); //the node in openSet having the lowest fScore[] value
-        if (current.equals(goal))
-          return reconstruct_path(current);
-
-        closedSet.add(current);
-
-        for (BoardNode neighbor : current.neighbors()){
-          if (!closedSet.contains(neighbor)){
-          // if (!openSet.contains(neighbor)) // not in openSet	// Discover a new node
-            q.insert(neighbor);
-          }
         }
       }
 
@@ -93,35 +68,24 @@ public class Solver {
       q.insert(start);
 
       while (!openSet.isEmpty()){
-        BoardNode current = openSet.poll();
-        BoardNode item = q.delMin();
-        if (!current.equals(item)){
-          println(current);
-          println(item);
-
-        }
-        assert(current.equals(item));
+        BoardNode item = openSet.poll();
+        BoardNode current = q.delMin();
         if (current.board.equals(goal.board))
-          return reconstruct_path(current);
+          return path(current);
 
         closedSet.add(current);
         for (BoardNode neighbor : current.neighbors()){
-          if (closedSet.contains(neighbor)){
-            continue;
-          }
-          if (!openSet.contains(neighbor)){
+          if (!closedSet.contains(neighbor) && !openSet.contains(neighbor)){
             openSet.add(neighbor);
             q.insert(neighbor);
           }
-      // return 0 - (moves + board.hamming());
         }
       }
 
       return null;
     }
 
-
-    Deque<BoardNode> reconstruct_path(BoardNode current){
+    Deque<BoardNode> path(BoardNode current){
       Deque<BoardNode> total_path = new ArrayDeque<BoardNode>();
       total_path.push(current);
       while (current.prevNode() != null){
