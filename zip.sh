@@ -1,6 +1,6 @@
-srcs="Deque.java RandomizedQueue.java Permutation.java"
+srcs="Board.java Solver.java"
 cd src/main/java
 cp $srcs ../../../
 cd ../../../
-zip queues-testing.zip $srcs
+zip submit.zip $srcs
 rm $srcs
