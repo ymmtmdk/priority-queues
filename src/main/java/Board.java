@@ -3,7 +3,7 @@ import java.util.*;
 
 public class Board {
   private class Blocks{
-    final char[] blocks;
+    private final char[] blocks;
     final int dimension;
 
     Blocks(int[][] blocks){
@@ -284,6 +284,27 @@ public class Board {
 
   public Board twin()                    // a board that is obtained by exchanging any pair of blocks
   {
+    int row1=-100;
+    int col1=-100;
+    int row2=-100;
+    int col2=-100;
+    if (rowOfBlank == 0){
+      row1 = 1;
+      col1 = 0;
+      row2 = 1;
+      col2 = 1;
+    }
+    else{
+      row1 = 0;
+      col1 = 0;
+      row2 = 0;
+      col2 = 1;
+    }
+
+    // exchange(blocks, row1, col1, row2, col2);
+    // Board bd = new Board(blocks);
+    // exchange(blocks, row1, col1, row2, col2);
+    // return bd;
     return null;
   }
 
@@ -310,6 +331,23 @@ public class Board {
     bl.set(row2, col2, tmp);
   }
 
+  private Board exBoard(int row0, int col0, int row1, int col1, int row2, int col2){
+    int n = blocks.get(row2, col2);
+
+    int prevManhattan = manhattan(n, blocks.dimension, row2, col2);
+    int prevHamming = hamming(n, blocks.dimension, row2, col2);
+    exchange(blocks, row1, col1, row2, col2);
+    int nextManhattan = manhattan(n, blocks.dimension, row1, col1);
+    int nextHamming = hamming(n,  blocks.dimension, row1, col1);
+    int newManhattan = manhattan - prevManhattan + nextManhattan;
+    int newHamming = hamming - prevHamming + nextHamming;
+    long newHash = calcHash(hashCode, dimension, n, row2, col2, row1, col1);
+    Board bd = newBoard(blocks, blocks.dimension, row2, col2, newHamming, newManhattan, newManhattan==0, newHash);
+    exchange(blocks, row1, col1, row2, col2);
+
+    return bd;
+  }
+
   private Board neighbor(Dir dir){
     int row=-100;
     int col=-100;
@@ -332,20 +370,7 @@ public class Board {
         col = colOfBlank + 1;
         break;
     }
-    int n = blocks.get(row, col);
-    assert(n != 0);
-
-    int prevManhattan = manhattan(n, blocks.dimension, row, col);
-    int prevHamming = hamming(n, blocks.dimension, row, col);
-    exchange(blocks, rowOfBlank, colOfBlank, row, col);
-    int nextManhattan = manhattan(n, blocks.dimension, rowOfBlank, colOfBlank);
-    int nextHamming = hamming(n,  blocks.dimension, rowOfBlank, colOfBlank);
-    int newManhattan = manhattan - prevManhattan + nextManhattan;
-    int newHamming = hamming - prevHamming + nextHamming;
-    long newHash = calcHash(hashCode, dimension, n, row, col, rowOfBlank, colOfBlank);
-    Board bd = newBoard(blocks, blocks.dimension, row, col, newHamming, newManhattan, newManhattan==0, newHash);
-    exchange(blocks, rowOfBlank, colOfBlank, row, col);
-    return bd;
+    return exBoard(rowOfBlank, colOfBlank, rowOfBlank, colOfBlank, row, col);
   }
 
   static private long calcHash(long hashCode, int dimension, int n, int rowOfBlank, int colOfBlank, int row, int col){

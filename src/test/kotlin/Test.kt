@@ -149,6 +149,13 @@ class TestBoard{
 }
 
 class TestSolver{
+  @Test fun testTwin(){
+    val bd = Util.board(In("8puzzle/puzzle2x2-00.txt"))
+    /* val tw = bd.twin() */
+    /* assertNotEquals(bd, tw) */
+    /* assertEquals(false, sl.isSolvable()) */
+  }
+
   @Test fun testSolver(){
     val sl = Util.solver(In("8puzzle/puzzle2x2-00.txt"))
     assertEquals(true, sl.isSolvable())
@@ -159,7 +166,7 @@ class TestSolver{
     for (n in 1..6){
       assertEquals(n, Util.solver(In("8puzzle/puzzle3x3-%02d.txt".format(n))).moves())
     }
-    for (n in 1..31){
+    for (n in 1..30){
       assertEquals(n, Util.solver(In("8puzzle/puzzle4x4-%02d.txt".format(n))).moves())
     }
   }

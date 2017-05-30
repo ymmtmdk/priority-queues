@@ -48,7 +48,7 @@ public class Solver {
       return null;
     }
 
-    Deque<BoardNode> aStar(BoardNode start, BoardNode goal){
+    Deque<BoardNode> aStar5(BoardNode start, BoardNode goal, BoardNode goal2){
       // Set<BoardNode> closedSet = new PriorityQueue<BoardNode>();
       PriorityQueue<BoardNode> closedSet = new PriorityQueue<BoardNode>();
       // PriorityQueue<BoardNode> openSet = new PriorityQueue<BoardNode>();
@@ -56,18 +56,50 @@ public class Solver {
       // openSet.add(start);
       q.insert(start);
 
+      int c = 0;
+      int io = 0;
       while (!q.isEmpty()){
         // BoardNode item = openSet.poll();
         BoardNode current = q.delMin();
+        c += 1;
+        // println("----------:"+c+":"+io);
         if (current.board.equals(goal.board))
           return path(current);
+        if (current.board.equals(goal2.board))
+          return null;
 
+        // println(current);
+        // println("neighbor");
         closedSet.add(current);
         for (BoardNode neighbor : current.neighbors()){
           // if (!closedSet.contains(neighbor) && !openSet.contains(neighbor)){
           if (!closedSet.contains(neighbor)){
             if (current.prevNode() == null || !current.prevNode().board.equals(neighbor.board)){
               // openSet.add(neighbor);
+              // println(neighbor);
+              q.insert(neighbor);
+              io += 1;
+            }
+          }
+        }
+      }
+
+      return null;
+    }
+
+    Deque<BoardNode> aStar(BoardNode start, BoardNode goal){
+      PriorityQueue<BoardNode> closedSet = new PriorityQueue<BoardNode>();
+      MinPQ<BoardNode> q = new MinPQ<BoardNode>(new PriorityComparator());
+      q.insert(start);
+
+      while (!q.isEmpty()){
+        BoardNode current = q.delMin();
+        if (current.board.equals(goal.board))
+          return path(current);
+        closedSet.add(current);
+        for (BoardNode neighbor : current.neighbors()){
+          if (!closedSet.contains(neighbor)){
+            if (current.prevNode() == null || !current.prevNode().board.equals(neighbor.board)){
               q.insert(neighbor);
             }
           }
@@ -147,20 +179,17 @@ public class Solver {
     }
 
     public int compareTo(BoardNode that){
-      return priority - that.priority;
+      if (board.equals(that.board)){
+        return 0;
+      }
+      return id - that.id;
     }
 
     public boolean equals(Object other)        // does this board equal y?
     {
       if (other == this) return true;
-      // if (other == null) return false;
-      // if (other.getClass() != this.getClass()) return false;
       BoardNode that = (BoardNode) other;
-      // if (id == that.id) return true;
-      // if (moves != that.moves) return false;
-      if (!board.equals(that.board)) return false;
-      // if (board.hamming() != that.board.hamming()) return false;
-      return true;
+      return board.equals(that.board);
     }
 
     public String toString(){
@@ -196,7 +225,11 @@ public class Solver {
 
     Deque<BoardNode> result;
     AStarSolver(Board start){
-      result = aStar(new BoardNode(null, start, 0), new BoardNode(null, goal(start), 0));
+      BoardNode bd = new BoardNode(null, start, 0);
+      BoardNode gl = new BoardNode(null, goal(start), 0);
+      // BoardNode gl2 = new BoardNode(null, goal(start).twin(), 0);
+
+      result = aStar(bd, gl);
     }
   }
 
