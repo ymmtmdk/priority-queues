@@ -2,18 +2,52 @@ import edu.princeton.cs.algs4.*;
 import java.util.*;
 
 public class Board {
-  private class Blocks{
+  private abstract class BlocksBase<T>{
+    abstract int dimension();
+    abstract int get(int row, int col);
+    abstract void set(int row, int col, int n);
+    abstract T copy(T blocks);
+    abstract BlocksBase<T> copy();
+    // abstract T copy(T blocks);
+
+    int[][] copyAsInt(){
+      int[][] bl = new int[dimension][dimension];
+      for (int row = 0; row < dimension; row++){
+        for (int col = 0; col < dimension; col++){
+          bl[row][col] = get(row, col);
+        }
+      }
+      return bl;
+    }
+  }
+
+  private static char[] copy(int[][] blocks){
+    int dimension = blocks.length;
+    char[] bl = new char[dimension*dimension];
+    for (int row = 0; row < dimension; row++){
+      for (int col = 0; col < dimension; col++){
+        bl[row*dimension+col] = (char)blocks[row][col];
+      }
+    }
+    return bl;
+  }
+
+  private class Blocks extends BlocksBase<char []>{
     private final char[] blocks;
     final int dimension;
 
     Blocks(int[][] blocks){
       this.dimension = blocks.length;
-      this.blocks = copy(blocks);
+      this.blocks = Board.copy(blocks);
     }
 
     Blocks(char[] blocks, int dimension){
       this.dimension = dimension;
       this.blocks = copy(blocks);
+    }
+
+    int dimension(){
+      return dimension;
     }
 
     int get(int row, int col){
@@ -22,26 +56,6 @@ public class Board {
 
     void set(int row, int col, int n){
       blocks[row*dimension+col] = (char)n;
-    }
-
-    char[] copy(int[][] blocks){
-      char[] bl = new char[dimension*dimension];
-      for (int row = 0; row < dimension; row++){
-        for (int col = 0; col < dimension; col++){
-          bl[row*dimension+col] = (char)blocks[row][col];
-        }
-      }
-
-      return bl;
-    }
-
-    int[][] copyAsInt(){
-      int[][] bl = new int[dimension][dimension];
-      for (int i = 0; i < blocks.length; i++){
-        bl[i/dimension][i%dimension] = blocks[i];
-      }
-
-      return bl;
     }
 
     char[] copy(char[] blocks){
@@ -65,18 +79,18 @@ public class Board {
   private final int rowOfBlank, colOfBlank;
   private final long hashCode;
 
-  private static Map<Long, Board> blocksCache;
+  private static Map<Long, Board> boardCache;
 
   private static Board newBoard(Blocks blocks, int dimension, int rowOfBlank, int colOfBlank, int hamming, int manhattan, boolean isGoal, long hashCode){
-    if (blocksCache == null){
-      blocksCache = new HashMap<Long, Board>();
+    if (boardCache == null){
+      boardCache = new HashMap<Long, Board>();
     }
-    if (blocksCache.containsKey(hashCode)){
-      return blocksCache.get(hashCode);
+    if (boardCache.containsKey(hashCode)){
+      return boardCache.get(hashCode);
     }
 
     Board bd = new Board(blocks.copy(), dimension, rowOfBlank, colOfBlank, hamming, manhattan, isGoal, hashCode);
-    blocksCache.put(hashCode, bd);
+    boardCache.put(hashCode, bd);
     return bd;
   }
 

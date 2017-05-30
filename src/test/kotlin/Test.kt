@@ -155,13 +155,13 @@ class TestSolver{
     assertEquals(true, sl.isSolvable())
     assertEquals(0, sl.moves())
     for (n in 1..6){
-      /* assertEquals(n, Util.solver(In("8puzzle/puzzle2x2-%02d.txt".format(n))).moves()) */
+      assertEquals(n, Util.solver(In("8puzzle/puzzle2x2-%02d.txt".format(n))).moves())
     }
     for (n in 1..6){
-      /* assertEquals(n, Util.solver(In("8puzzle/puzzle3x3-%02d.txt".format(n))).moves()) */
+      assertEquals(n, Util.solver(In("8puzzle/puzzle3x3-%02d.txt".format(n))).moves())
     }
     for (n in 1..30){
-      /* assertEquals(n, Util.solver(In("8puzzle/puzzle4x4-%02d.txt".format(n))).moves()) */
+      assertEquals(n, Util.solver(In("8puzzle/puzzle4x4-%02d.txt".format(n))).moves())
     }
   }
 

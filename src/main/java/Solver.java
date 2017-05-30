@@ -226,7 +226,7 @@ public class Solver {
   }
   public int moves()                     // min number of moves to solve initial board; -1 if unsolvable
   {
-    return aStarSolver.result.size()-1;
+    return isSolvable() ? aStarSolver.result.size()-1 : -1;
   }
 
   public Iterable<Board> solution()      // sequence of boards in a shortest solution; null if unsolvable
