@@ -6,6 +6,12 @@ public class Solver {
     abstract int heuristic_cost_estimate(BoardNode start, BoardNode goal);
     abstract int dist_between(BoardNode current, BoardNode neighbor);
 
+    private class PriorityComparator implements Comparator<BoardNode>{
+      public int compare(BoardNode a, BoardNode b){
+        return a.priority() - b.priority();
+      }
+    }
+
     Deque<BoardNode> aStar4(BoardNode start, BoardNode goal){
       PriorityQueue<BoardNode> closedSet = new PriorityQueue<BoardNode>();
       PriorityQueue<BoardNode> closedSet2 = new PriorityQueue<BoardNode>();
@@ -43,9 +49,10 @@ public class Solver {
     }
 
     Deque<BoardNode> aStar(BoardNode start, BoardNode goal){
+      // Set<BoardNode> closedSet = new PriorityQueue<BoardNode>();
       PriorityQueue<BoardNode> closedSet = new PriorityQueue<BoardNode>();
       // PriorityQueue<BoardNode> openSet = new PriorityQueue<BoardNode>();
-      MinPQ<BoardNode> q = new MinPQ<BoardNode>();
+      MinPQ<BoardNode> q = new MinPQ<BoardNode>(new PriorityComparator());
       // openSet.add(start);
       q.insert(start);
 
@@ -107,7 +114,7 @@ public class Solver {
 
   private class BoardNode implements Comparable<BoardNode>{
     private final Board board;
-    private final int moves;
+    private final int moves, priority;
     private final int id;
     private final BoardNode prevNode;
 
@@ -119,19 +126,8 @@ public class Solver {
       if (id > 100000){
         throw new ArithmeticException();
       }
-    }
 
-    private Board goal(){
-      int n = board.dimension();
-      int[][] blocks = new int[n][n];
-
-      for (int row = 0; row < n; row++){
-        for (int col = 0; col < n; col++){
-          blocks[row][col] = row*n+col+1;
-        }
-      }
-      blocks[n-1][n-1] = 0;
-      return new Board(blocks);
+      this.priority = moves + board.manhattan();
     }
 
     public BoardNode prevNode(){
@@ -147,20 +143,20 @@ public class Solver {
     }
 
     private int priority(){
-      return (moves + board.manhattan());
+      return priority;
     }
 
     public int compareTo(BoardNode that){
-      return priority() - that.priority();
+      return priority - that.priority;
     }
 
     public boolean equals(Object other)        // does this board equal y?
     {
       if (other == this) return true;
-      if (other == null) return false;
-      if (other.getClass() != this.getClass()) return false;
+      // if (other == null) return false;
+      // if (other.getClass() != this.getClass()) return false;
       BoardNode that = (BoardNode) other;
-      if (id == that.id) return true;
+      // if (id == that.id) return true;
       // if (moves != that.moves) return false;
       if (!board.equals(that.board)) return false;
       // if (board.hamming() != that.board.hamming()) return false;
@@ -178,6 +174,19 @@ public class Solver {
   }
 
   private class AStarSolver extends AStar{
+    private Board goal(Board board){
+      int n = board.dimension();
+      int[][] blocks = new int[n][n];
+
+      for (int row = 0; row < n; row++){
+        for (int col = 0; col < n; col++){
+          blocks[row][col] = row*n+col+1;
+        }
+      }
+      blocks[n-1][n-1] = 0;
+      return new Board(blocks);
+    }
+
     int heuristic_cost_estimate(BoardNode start, BoardNode goal){
       return start.priority();
     }
@@ -187,8 +196,7 @@ public class Solver {
 
     Deque<BoardNode> result;
     AStarSolver(Board start){
-      BoardNode bn = new BoardNode(null, start, 0);
-      result = aStar(bn, new BoardNode(null, bn.goal(), 0));
+      result = aStar(new BoardNode(null, start, 0), new BoardNode(null, goal(start), 0));
     }
   }
 
