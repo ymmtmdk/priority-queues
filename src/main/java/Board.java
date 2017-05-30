@@ -35,6 +35,15 @@ public class Board {
       return bl;
     }
 
+    int[][] copyAsInt(){
+      int[][] bl = new int[dimension][dimension];
+      for (int i = 0; i < blocks.length; i++){
+        bl[i/dimension][i%dimension] = blocks[i];
+      }
+
+      return bl;
+    }
+
     char[] copy(char[] blocks){
       char[] bl = new char[blocks.length];
       for (int i = 0; i < blocks.length; i++){
@@ -293,13 +302,15 @@ public class Board {
       row2 = 1;
     }
 
-    println(this);
     assert(blocks.get(rowOfBlank, colOfBlank) == 0);
     assert(blocks.get(row1, col1) != 0);
     assert(blocks.get(row2, col2) != 0);
-    println("ex: "+ rowOfBlank + ":" + colOfBlank + ":" + row1);
-    Board bd = exBoard(rowOfBlank, colOfBlank, row1, col1, row2, col2);
-    println(bd);
+    // println("ex: "+ rowOfBlank + ":" + colOfBlank + ":" + row1);
+    exchange(row1, col1, row2, col2);
+    Board bd = new Board(blocks.copyAsInt());
+    exchange(row1, col1, row2, col2);
+    // Board bd = exBoard(rowOfBlank, colOfBlank, row1, col1, row2, col2);
+    // println(bd);
     assert(bd.blocks.get(rowOfBlank, colOfBlank) == 0);
     assert(bd.blocks.get(row1, col1) != 0);
     assert(bd.blocks.get(row2, col2) != 0);
@@ -323,10 +334,10 @@ public class Board {
     return hashCode == that.hashCode;
   }
 
-  private void exchange(Blocks bl, int row1, int col1, int row2 ,int col2){
-    int tmp = bl.get(row1, col1);
-    bl.set(row1, col1, bl.get(row2, col2));
-    bl.set(row2, col2, tmp);
+  private void exchange(int row1, int col1, int row2 ,int col2){
+    int tmp = blocks.get(row1, col1);
+    blocks.set(row1, col1, blocks.get(row2, col2));
+    blocks.set(row2, col2, tmp);
   }
 
   private Board exBoard(int row0, int col0, int row1, int col1, int row2, int col2){
@@ -334,7 +345,7 @@ public class Board {
 
     int prevManhattan = manhattan(n, blocks.dimension, row2, col2);
     int prevHamming = hamming(n, blocks.dimension, row2, col2);
-    exchange(blocks, row1, col1, row2, col2);
+    exchange(row1, col1, row2, col2);
     int nextManhattan = manhattan(n, blocks.dimension, row1, col1);
     int nextHamming = hamming(n,  blocks.dimension, row1, col1);
     int newManhattan = manhattan - prevManhattan + nextManhattan;
@@ -342,7 +353,7 @@ public class Board {
     long newHash = calcHash(row2, col2, row1, col1);
     assert(newHash == calcHash());
     Board bd = newBoard(blocks, blocks.dimension, row0, col0, newHamming, newManhattan, newManhattan==0, newHash);
-    exchange(blocks, row1, col1, row2, col2);
+    exchange(row1, col1, row2, col2);
 
     return bd;
   }

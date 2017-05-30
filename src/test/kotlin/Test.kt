@@ -147,7 +147,6 @@ class TestSolver{
     assertEquals("2\n 1  0 \n 3  2 \n", tw2.toString())
     assertEquals(true, Solver(tw2).isSolvable())
     assertNotEquals(bd2.toString(), tw2.toString())
-    assertEquals("", tw2.toString())
     /* assertEquals(false, Util.solver(In("8puzzle/puzzle3x3-unsolvable1.txt")).isSolvable()) */
   }
 
