@@ -6,12 +6,10 @@ import java.lang.reflect.Method;
 public class Board {
   private class Blocks{
     private final int[][] blocks;
-    private final int dimension;
-    final int length;
+    final int dimension;
     Blocks(int[][] blocks){
       this.blocks = blocks;
       this.dimension = blocks.length;
-      this.length = dimension;
     }
 
     int get(int row, int col){
@@ -63,11 +61,11 @@ public class Board {
     return r;
   }
 
-  private static long calcHash(Blocks blocks){
+  private long calcHash(){
     long r = 0;
-    for (int row = 0; row < blocks.length; row++){
-      for (int col = 0; col < blocks.length; col++){
-        int i = row*blocks.length+col+1;
+    for (int row = 0; row < blocks.dimension; row++){
+      for (int col = 0; col < blocks.dimension; col++){
+        int i = row*blocks.dimension+col+1;
         int n = blocks.get(row, col);
         r += fact(i)*n;
       }
@@ -106,9 +104,9 @@ public class Board {
      }
 
 */
-  static private int[] calcBlank(Blocks blocks){
+  private int[] calcBlank(){
     int[] point = new int[2];
-    int dimension = blocks.length;
+    int dimension = blocks.dimension;
     for (int row = 0; row < dimension; row++){
       for (int col = 0; col < dimension; col++){
         int n = blocks.get(row, col);
@@ -137,15 +135,13 @@ public class Board {
   public Board(int[][] bl)           // construct a board from an n-by-n array of blocks
   {
     this.blocks = new Blocks(bl);
-    this.dimension = blocks.length;
-    this.rowOfBlank = calcBlank(blocks)[0];
-    this.colOfBlank = calcBlank(blocks)[1];
-    this.hamming = calcHamming(blocks);
-    this.manhattan = calcManhattan(blocks);
-    this.isGoal = calcIsGoal(blocks);
-    this.hashCode = calcHash(blocks);
-
-    // throw error if noBlank
+    this.dimension = blocks.dimension;
+    this.rowOfBlank = calcBlank()[0];
+    this.colOfBlank = calcBlank()[1];
+    this.hamming = calcHamming();
+    this.manhattan = calcManhattan();
+    this.isGoal = calcIsGoal();
+    this.hashCode = calcHash();
   }
 
   private Board(Blocks blocks, int dimension, int rowOfBlank, int colOfBlank, int hamming, int manhattan, boolean isGoal, long hashCode){
@@ -157,22 +153,8 @@ public class Board {
     this.manhattan = manhattan;
     this.isGoal = isGoal;
     this.hashCode = hashCode;
-
-    // assert(blocks[rowOfBlank][colOfBlank] == 0);
   }
-/*
-  static private int[][] copyBlocks(int[][] blocks){
-    int n = blocks.length;
-    int[][] bl = new int[n][n];
-    for (int row = 0; row < n; row++){
-      for (int col = 0; col < n; col++){
-        bl[row][col] = blocks[row][col];
-      }
-    }
 
-    return bl;
-  }
-  */
   public int dimension()                 // board dimension n
   {
     return dimension;
@@ -201,13 +183,13 @@ public class Board {
     return (n != 0 && correctNumber(dimension, row, col) != n) ? 1 : 0;
   }
 
-  static private int calcHamming(Blocks blocks)                   // number of blocks out of place
+  private int calcHamming()                   // number of blocks out of place
   {
     int m = 0;
-    for (int row = 0; row < blocks.length; row++){
-      for (int col = 0; col < blocks.length; col++){
+    for (int row = 0; row < blocks.dimension; row++){
+      for (int col = 0; col < blocks.dimension; col++){
         int n = blocks.get(row, col);
-        m += hamming(n, blocks.length, row, col);
+        m += hamming(n, blocks.dimension, row, col);
       }
     }
     return m;
@@ -245,13 +227,13 @@ public class Board {
     return Math.abs(row-correntRowOfN)+Math.abs(col-correntColOfN);
   }
 
-  static private int calcManhattan(Blocks blocks)                 // sum of Manhattan distances between blocks and goal
+  private int calcManhattan()                 // sum of Manhattan distances between blocks and goal
   {
     int m = 0;
-    for (int row = 0; row < blocks.length; row++){
-      for (int col = 0; col < blocks.length; col++){
+    for (int row = 0; row < blocks.dimension; row++){
+      for (int col = 0; col < blocks.dimension; col++){
         int n = blocks.get(row, col);
-        m += manhattan(n, blocks.length, row, col);
+        m += manhattan(n, blocks.dimension, row, col);
       }
     }
     return m;
@@ -263,8 +245,8 @@ public class Board {
     return manhattan;
   }
 
-  static private boolean calcIsGoal(Blocks blocks){
-    int dimension = blocks.length;
+  private boolean calcIsGoal(){
+    int dimension = blocks.dimension;
     for (int row = 0; row < dimension; row++){
       for (int col = 0; col < dimension; col++){
         int n = blocks.get(row, col);
@@ -333,20 +315,18 @@ public class Board {
         col = colOfBlank + 1;
         break;
     }
-    // int [][] bl = blocks;
     int n = blocks.get(row, col);
     assert(n != 0);
-    // assert(blocks[rowOfBlank][colOfBlank] == 0);
 
-    int prevManhattan = manhattan(n, blocks.length, row, col);
-    int prevHamming = hamming(n, blocks.length, row, col);
+    int prevManhattan = manhattan(n, blocks.dimension, row, col);
+    int prevHamming = hamming(n, blocks.dimension, row, col);
     exchange(blocks, rowOfBlank, colOfBlank, row, col);
-    int nextManhattan = manhattan(n, blocks.length, rowOfBlank, colOfBlank);
-    int nextHamming = hamming(n,  blocks.length, rowOfBlank, colOfBlank);
+    int nextManhattan = manhattan(n, blocks.dimension, rowOfBlank, colOfBlank);
+    int nextHamming = hamming(n,  blocks.dimension, rowOfBlank, colOfBlank);
     int newManhattan = manhattan - prevManhattan + nextManhattan;
     int newHamming = hamming - prevHamming + nextHamming;
     long newHash = calcHash(hashCode, dimension, n, row, col, rowOfBlank, colOfBlank);
-    Board bd = newBoard(blocks, blocks.length, row, col, newHamming, newManhattan, newManhattan==0, newHash);
+    Board bd = newBoard(blocks, blocks.dimension, row, col, newHamming, newManhattan, newManhattan==0, newHash);
     exchange(blocks, rowOfBlank, colOfBlank, row, col);
     return bd;
   }
@@ -388,7 +368,7 @@ public class Board {
 
   private static String blocksString(Blocks blocks){
     StringBuilder s = new StringBuilder();
-    int n = blocks.length;
+    int n = blocks.dimension;
     s.append(n + "\n");
     for (int i = 0; i < n; i++) {
       for (int j = 0; j < n; j++) {
