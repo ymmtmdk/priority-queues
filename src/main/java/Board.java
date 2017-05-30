@@ -1,7 +1,5 @@
 import edu.princeton.cs.algs4.*;
 import java.util.*;
-import java.util.function.*;
-import java.lang.reflect.Method;
 
 public class Board {
   private class Blocks{
@@ -77,6 +75,16 @@ public class Board {
   }
 
   /*
+     @FunctionalInterface
+     public interface CellCallBack<T> {
+     public T get(int row, int col, int n);
+     }
+
+     @FunctionalInterface
+     public interface CellReduce<T> {
+     public T get(T t, int row, int col, int n);
+     }
+
      private static <T> T reduce(int [][] bl, T t, CellReduce<T> ccb){
      for (int row = 0; row < bl.length; row++){
      for (int col = 0; col < bl.length; col++){
@@ -158,16 +166,6 @@ public class Board {
   public int dimension()                 // board dimension n
   {
     return dimension;
-  }
-
-  @FunctionalInterface
-  public interface CellCallBack<T> {
-    public T get(int row, int col, int n);
-  }
-
-  @FunctionalInterface
-  public interface CellReduce<T> {
-    public T get(T t, int row, int col, int n);
   }
 
   static private int correctNumber(int dimension, int row, int col){
