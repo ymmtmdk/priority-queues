@@ -1,8 +1,9 @@
 import edu.princeton.cs.algs4.*
 import org.junit.Test
 import org.junit.Assert.*
-import org.hamcrest.MatcherAssert.*
+/* import org.hamcrest.MatcherAssert.* */
 import org.hamcrest.Matchers.*
+/* import org.hamcrest.text.* */
 
 class TestPQ{
   @Test fun test(){
@@ -67,26 +68,6 @@ object Util{
   fun solver(inf: In): Solver{
     /* doPrivateMethod(Board::class, "fact", 1) */
     return Solver(board(inf))
-  }
-
-  fun doPrivateMethod(target: Any, field: String, n: Int): Any{
-    /*
-    val c = Util.javaClass
-    val method = c.getDeclaredMethod("f")
-    method.setAccessible(true)
-    method.invoke(Util)
-      java.lang.reflect.Method method = Board.class.getMethod(name, int.class);
-      method.setAccessible(true);
-      method.invoke(null, n);
-    */
-    val c = target.javaClass
-    val method = c.getMethod(field, Int.javaClass)
-    method.setAccessible(true)
-    return method.invoke(null, n)
-  }
-
-  private fun f(){
-    println("f")
   }
 }
 
@@ -157,7 +138,14 @@ class TestSolver{
     val sl = Solver(tw);
     assertEquals(false, sl.isSolvable())
     assertEquals(false, Util.solver(In("8puzzle/puzzle2x2-unsolvable1.txt")).isSolvable())
-    assertEquals(false, Util.solver(In("8puzzle/puzzle3x3-unsolvable1.txt")).isSolvable())
+    val bd2 = Util.board(In("8puzzle/puzzle2x2-unsolvable1.txt"))
+    val tw2 = bd2.twin()
+    assertThat(bd2.toString(), matchesPattern("2\n 1  0 \n 2  3 \n"))
+    assertThat(tw2.toString(), matchesPattern("2\n 1  0 \n 3  2 \n"))
+    assertEquals(true, Solver(tw2).isSolvable())
+    assertNotEquals(bd2.toString(), tw2.toString())
+    assertEquals("", tw2.toString())
+    /* assertEquals(false, Util.solver(In("8puzzle/puzzle3x3-unsolvable1.txt")).isSolvable()) */
   }
 
   @Test fun testSolver(){
@@ -175,7 +163,8 @@ class TestSolver{
     }
   }
 
-  @Test fun callMain(){
+  fun callMain(){
+    Solver.main(arrayOf("8puzzle/puzzle00.txt"))
     Solver.main(arrayOf("8puzzle/puzzle2x2-00.txt"))
     Solver.main(arrayOf("8puzzle/puzzle2x2-01.txt"))
     Solver.main(arrayOf("8puzzle/puzzle2x2-02.txt"))

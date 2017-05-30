@@ -88,7 +88,7 @@ public class Board {
       }
     }
 
-    assert(r > 0);
+    // assert(r > 0);
     return r;
     // return reduce(blocks, 7*blocks.length+3, (t, row, col, n) -> t * 23 + n);
   }
