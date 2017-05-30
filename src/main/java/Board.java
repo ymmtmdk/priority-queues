@@ -3,9 +3,14 @@ import java.util.*;
 
 public class Board {
   private class Blocks{
-    private final int[][] blocks;
+    private final char[][] blocks;
     final int dimension;
     Blocks(int[][] blocks){
+      this.dimension = blocks.length;
+      this.blocks = copy(blocks);
+    }
+
+    Blocks(char[][] blocks){
       this.dimension = blocks.length;
       this.blocks = copy(blocks);
     }
@@ -15,28 +20,33 @@ public class Board {
     }
 
     void set(int row, int col, int n){
-      blocks[row][col] = n;
+      blocks[row][col] = (char)n;
     }
 
-    int[][] copy(int[][] blocks){
-      int[][] bl = new int[dimension][dimension];
+    char[][] copy(int[][] blocks){
+      char[][] bl = new char[dimension][dimension];
       for (int row = 0; row < dimension; row++){
         for (int col = 0; col < dimension; col++){
-          bl[row][col] = blocks[row][col];
+          bl[row][col] = (char)blocks[row][col];
         }
       }
 
       return bl;
     }
-    Blocks copy(){
-      int[][] bl = new int[dimension][dimension];
+
+    char[][] copy(char[][] blocks){
+      char[][] bl = new char[dimension][dimension];
       for (int row = 0; row < dimension; row++){
         for (int col = 0; col < dimension; col++){
-          bl[row][col] = get(row, col);
+          bl[row][col] = (char)blocks[row][col];
         }
       }
 
-      return new Blocks(bl);
+      return bl;
+    }
+
+    Blocks copy(){
+      return new Blocks(blocks);
     }
   }
 
