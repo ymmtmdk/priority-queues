@@ -49,7 +49,7 @@ public class Solver {
       openSet.add(start);
       q.insert(start);
 
-      while (!openSet.isEmpty()){
+      while (!q.isEmpty()){
         BoardNode item = openSet.poll();
         BoardNode current = q.delMin();
         if (current.board.equals(goal.board))
@@ -84,6 +84,7 @@ public class Solver {
       }
       return total_path;
     }
+
     Deque<BoardNode> path(BoardNode current){
       Deque<BoardNode> total_path = new ArrayDeque<BoardNode>();
       total_path.push(current);
