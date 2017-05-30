@@ -231,6 +231,10 @@ public class Solver {
 
   public Iterable<Board> solution()      // sequence of boards in a shortest solution; null if unsolvable
   {
+    if (!isSolvable()){
+      return null;
+    }
+
     Deque<Board> q = new ArrayDeque<Board>();
     for (BoardNode node : aStarSolver.result){
       q.addFirst(node.board);
