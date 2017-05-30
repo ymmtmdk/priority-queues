@@ -51,7 +51,7 @@ public class Board {
       this.dimension = blocks.length;
       assert(dimension <= 4);
       this.blocks = copyInt(blocks);
-      this.cab = new CharAryBlocks(blocks);
+      // this.cab = new CharAryBlocks(blocks);
     }
 
     LongBlocks(long blocks, int dimension){
@@ -95,15 +95,15 @@ public class Board {
       // println("m   :"+str(m));
       blocks = (blocks & mask) | m;
       // println("afte:"+str(blocks));
-      cab.set(row, col, n);
+      // cab.set(row, col, n);
 
-      if(cab.get(row,col) != get(row,col)){
+      // if(cab.get(row,col) != get(row,col)){
       // println("m   :"+str(m));
       // println("get :"+get(row,col));
       // println("afte:"+str(blocks));
-      }
-      assert(get(row,col) == n);
-      assert(cab.get(row,col) == get(row,col));
+      // }
+      // assert(get(row,col) == n);
+      // assert(cab.get(row,col) == get(row,col));
     }
 
     Long copyInt(int[][] blocks){
