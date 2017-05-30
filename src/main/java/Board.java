@@ -6,8 +6,8 @@ public class Board {
     private final int[][] blocks;
     final int dimension;
     Blocks(int[][] blocks){
-      this.blocks = blocks;
       this.dimension = blocks.length;
+      this.blocks = copy(blocks);
     }
 
     int get(int row, int col){
@@ -18,6 +18,16 @@ public class Board {
       blocks[row][col] = n;
     }
 
+    int[][] copy(int[][] blocks){
+      int[][] bl = new int[dimension][dimension];
+      for (int row = 0; row < dimension; row++){
+        for (int col = 0; col < dimension; col++){
+          bl[row][col] = blocks[row][col];
+        }
+      }
+
+      return bl;
+    }
     Blocks copy(){
       int[][] bl = new int[dimension][dimension];
       for (int row = 0; row < dimension; row++){
