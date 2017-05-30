@@ -2,13 +2,13 @@ import edu.princeton.cs.algs4.*;
 import java.util.*;
 
 public class Board {
-  private abstract class BlocksBase<T>{
+  private abstract class Blocks<T>{
     abstract int dimension();
     abstract int get(int row, int col);
     abstract void set(int row, int col, int n);
-    abstract T copy(T blocks);
-    abstract BlocksBase<T> copy();
-    // abstract T copy(T blocks);
+    abstract T copyT(T blocks);
+    abstract T copyInt(int[][] blocks);
+    abstract Blocks<T> dup();
 
     int[][] copyAsInt(){
       int[][] bl = new int[dimension][dimension];
@@ -21,29 +21,125 @@ public class Board {
     }
   }
 
-  private static char[] copy(int[][] blocks){
-    int dimension = blocks.length;
-    char[] bl = new char[dimension*dimension];
-    for (int row = 0; row < dimension; row++){
-      for (int col = 0; col < dimension; col++){
-        bl[row*dimension+col] = (char)blocks[row][col];
-      }
-    }
-    return bl;
+  private void testBlocks(){
+    int[][] bl = new int[3][3];
+    bl[0][0] = 1;
+    bl[0][1] = 0;
+    bl[1][0] = 2;
+    bl[1][1] = 3;
+    LongBlocks lb = new LongBlocks(bl);
+    assert(1 == lb.get(0,0));
+    lb.set(0,0,0);
+    assert(0 == lb.get(0,0));
+    lb.set(0,0,2);
+    assert(2 == lb.get(0,0));
+    assert(2 == lb.get(1,0));
+    lb.set(1,0,5);
+    assert(5 == lb.get(1,0));
+    lb.set(1,1,15);
+    assert(15 == lb.get(1,1));
+    lb.set(2,2,6);
+    assert(6 == lb.get(2,2));
   }
 
-  private class Blocks extends BlocksBase<char []>{
+  private class LongBlocks extends Blocks<Long>{
+    private long blocks;
+    final int dimension;
+    // private final CharAryBlocks cab;
+
+    LongBlocks(int[][] blocks){
+      this.dimension = blocks.length;
+      assert(dimension <= 4);
+      this.blocks = copyInt(blocks);
+      this.cab = new CharAryBlocks(blocks);
+    }
+
+    LongBlocks(long blocks, int dimension){
+      this.dimension = dimension;
+      assert(dimension <= 4);
+      this.blocks = copyT(blocks);
+      // this.cab = new CharAryBlocks(copyAsInt());
+    }
+
+    int dimension(){
+      return dimension;
+    }
+
+    long idx(int row, int col){
+      return row*dimension+col;
+    }
+
+    int get(int row, int col){
+      // println("get :"+str(blocks));
+      // println("idx :"+idx(row,col));
+      long n = (blocks >> (idx(row,col)*4)) & 0x0f;
+      // println("n   :"+n);
+      return (int)n;
+    }
+
+    String str(long n){
+      return String.format("%64s", Long.toBinaryString(n));
+    }
+
+    void set(int row, int col, int n){
+      assert(n<16);
+      long l = n;
+      // println("row :"+row);
+      // println("col :"+col);
+      // println("n   :"+n);
+      // println("idx :"+idx(row,col));
+      long mask = ~(0x0fL << idx(row,col)*4);
+      long m = l << idx(row,col)*4;
+      // println("befo:"+str(blocks));
+      // println("mask:"+str(mask));
+      // println("m   :"+str(m));
+      blocks = (blocks & mask) | m;
+      // println("afte:"+str(blocks));
+      cab.set(row, col, n);
+
+      if(cab.get(row,col) != get(row,col)){
+      // println("m   :"+str(m));
+      // println("get :"+get(row,col));
+      // println("afte:"+str(blocks));
+      }
+      assert(get(row,col) == n);
+      assert(cab.get(row,col) == get(row,col));
+    }
+
+    Long copyInt(int[][] blocks){
+      int dimension = blocks.length;
+      long r = 0;
+      for (int row = 0; row < dimension; row++){
+        for (int col = 0; col < dimension; col++){
+          long l = blocks[row][col];
+          r += (l << (idx(row,col)*4));
+          // println(str(r));
+        }
+      }
+      return r;
+    }
+
+    Long copyT(Long blocks){
+      return blocks;
+    }
+
+    LongBlocks dup(){
+      return new LongBlocks(blocks, dimension);
+    }
+  }
+
+  private class CharAryBlocks extends Blocks<char []>{
     private final char[] blocks;
     final int dimension;
 
-    Blocks(int[][] blocks){
+    CharAryBlocks(int[][] blocks){
       this.dimension = blocks.length;
-      this.blocks = Board.copy(blocks);
+      this.blocks = copyInt(blocks);
     }
 
-    Blocks(char[] blocks, int dimension){
+    CharAryBlocks(char[] blocks, int dimension){
       this.dimension = dimension;
-      this.blocks = copy(blocks);
+      this.blocks = copyT(blocks);
     }
 
     int dimension(){
@@ -58,7 +154,18 @@ public class Board {
       blocks[row*dimension+col] = (char)n;
     }
 
-    char[] copy(char[] blocks){
+    char[] copyInt(int[][] blocks){
+      int dimension = blocks.length;
+      char[] bl = new char[dimension*dimension];
+      for (int row = 0; row < dimension; row++){
+        for (int col = 0; col < dimension; col++){
+          bl[row*dimension+col] = (char)blocks[row][col];
+        }
+      }
+      return bl;
+    }
+
+    char[] copyT(char[] blocks){
       char[] bl = new char[blocks.length];
       for (int i = 0; i < blocks.length; i++){
         bl[i] = blocks[i];
@@ -67,8 +174,8 @@ public class Board {
       return bl;
     }
 
-    Blocks copy(){
-      return new Blocks(blocks, dimension);
+    CharAryBlocks dup(){
+      return new CharAryBlocks(blocks, dimension);
     }
   }
 
@@ -89,7 +196,8 @@ public class Board {
       return boardCache.get(hashCode);
     }
 
-    Board bd = new Board(blocks.copy(), dimension, rowOfBlank, colOfBlank, hamming, manhattan, isGoal, hashCode);
+    Board bd = new Board(blocks.dup(), dimension, rowOfBlank, colOfBlank, hamming, manhattan, isGoal, hashCode);
+    // bd.testBlocks();
     boardCache.put(hashCode, bd);
     return bd;
   }
@@ -103,9 +211,9 @@ public class Board {
 
   private long calcHash(){
     long r = 0;
-    for (int row = 0; row < blocks.dimension; row++){
-      for (int col = 0; col < blocks.dimension; col++){
-        int i = row*blocks.dimension+col+1;
+    for (int row = 0; row < blocks.dimension(); row++){
+      for (int col = 0; col < blocks.dimension(); col++){
+        int i = row*blocks.dimension()+col+1;
         int n = blocks.get(row, col);
         r += fact(i)*n;
       }
@@ -116,47 +224,9 @@ public class Board {
     // return reduce(blocks, 7*blocks.length+3, (t, row, col, n) -> t * 23 + n);
   }
 
-  /*
-     @FunctionalInterface
-     public interface CellCallBack<T> {
-     public T get(int row, int col, int n);
-     }
-
-     @FunctionalInterface
-     public interface CellReduce<T> {
-     public T get(T t, int row, int col, int n);
-     }
-
-     private static <T> T reduce(int [][] bl, T t, CellReduce<T> ccb){
-     for (int row = 0; row < bl.length; row++){
-     for (int col = 0; col < bl.length; col++){
-     t = ccb.get(t, row, col, bl[row][col]);
-     }
-     }
-     return t;
-     }
-
-     static private int count(int[][] bl, CellCallBack<Boolean> ccb){
-     return reduce(bl, 0, (t, row, col, n) ->
-     t + (ccb.get(row, col, n) ? 1 : 0)
-     );
-     }
-
-     static private boolean all(int[][] bl, CellCallBack<Boolean> ccb){
-     for (int row = 0; row < bl.length; row++){
-     for (int col = 0; col < bl.length; col++){
-     if (!ccb.get(row, col, bl[row][col])){
-     return false;
-     }
-     }
-     }
-     return true;
-     }
-
-*/
   private int[] calcBlank(){
     int[] point = new int[2];
-    int dimension = blocks.dimension;
+    int dimension = blocks.dimension();
     for (int row = 0; row < dimension; row++){
       for (int col = 0; col < dimension; col++){
         int n = blocks.get(row, col);
@@ -184,8 +254,8 @@ public class Board {
   // (where blocks[i][j] = block in row i, column j)
   public Board(int[][] bl)           // construct a board from an n-by-n array of blocks
   {
-    this.blocks = new Blocks(bl);
-    this.dimension = blocks.dimension;
+    this.blocks = new LongBlocks(bl);
+    this.dimension = blocks.dimension();
     this.rowOfBlank = calcBlank()[0];
     this.colOfBlank = calcBlank()[1];
     this.hamming = calcHamming();
@@ -226,10 +296,10 @@ public class Board {
   private int calcHamming()                   // number of blocks out of place
   {
     int m = 0;
-    for (int row = 0; row < blocks.dimension; row++){
-      for (int col = 0; col < blocks.dimension; col++){
+    for (int row = 0; row < blocks.dimension(); row++){
+      for (int col = 0; col < blocks.dimension(); col++){
         int n = blocks.get(row, col);
-        m += hamming(n, blocks.dimension, row, col);
+        m += hamming(n, blocks.dimension(), row, col);
       }
     }
     return m;
@@ -270,10 +340,10 @@ public class Board {
   private int calcManhattan()                 // sum of Manhattan distances between blocks and goal
   {
     int m = 0;
-    for (int row = 0; row < blocks.dimension; row++){
-      for (int col = 0; col < blocks.dimension; col++){
+    for (int row = 0; row < blocks.dimension(); row++){
+      for (int col = 0; col < blocks.dimension(); col++){
         int n = blocks.get(row, col);
-        m += manhattan(n, blocks.dimension, row, col);
+        m += manhattan(n, blocks.dimension(), row, col);
       }
     }
     return m;
@@ -286,7 +356,7 @@ public class Board {
   }
 
   private boolean calcIsGoal(){
-    int dimension = blocks.dimension;
+    int dimension = blocks.dimension();
     for (int row = 0; row < dimension; row++){
       for (int col = 0; col < dimension; col++){
         int n = blocks.get(row, col);
@@ -357,16 +427,16 @@ public class Board {
   private Board exBoard(int row0, int col0, int row1, int col1, int row2, int col2){
     int n = blocks.get(row2, col2);
 
-    int prevManhattan = manhattan(n, blocks.dimension, row2, col2);
-    int prevHamming = hamming(n, blocks.dimension, row2, col2);
+    int prevManhattan = manhattan(n, blocks.dimension(), row2, col2);
+    int prevHamming = hamming(n, blocks.dimension(), row2, col2);
     exchange(row1, col1, row2, col2);
-    int nextManhattan = manhattan(n, blocks.dimension, row1, col1);
-    int nextHamming = hamming(n,  blocks.dimension, row1, col1);
+    int nextManhattan = manhattan(n, blocks.dimension(), row1, col1);
+    int nextHamming = hamming(n,  blocks.dimension(), row1, col1);
     int newManhattan = manhattan - prevManhattan + nextManhattan;
     int newHamming = hamming - prevHamming + nextHamming;
     long newHash = calcHash(row2, col2, row1, col1);
     assert(newHash == calcHash());
-    Board bd = newBoard(blocks, blocks.dimension, row0, col0, newHamming, newManhattan, newManhattan==0, newHash);
+    Board bd = newBoard(blocks, blocks.dimension(), row0, col0, newHamming, newManhattan, newManhattan==0, newHash);
     exchange(row1, col1, row2, col2);
 
     return bd;
@@ -436,7 +506,7 @@ public class Board {
 
   private static String blocksString(Blocks blocks){
     StringBuilder s = new StringBuilder();
-    int n = blocks.dimension;
+    int n = blocks.dimension();
     s.append(n + "\n");
     for (int i = 0; i < n; i++) {
       for (int j = 0; j < n; j++) {

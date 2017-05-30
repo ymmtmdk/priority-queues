@@ -13,6 +13,7 @@ public class StackTest{
     assertEquals("2\n 1  0 \n 2  3 \n", bd.toString());
     assertEquals("2\n 1  0 \n 3  2 \n", bd.twin().toString());
     assertEquals("2\n 1  0 \n 2  3 \n", bd.twin().twin().toString());
+    new Solver(bd);
      // assertEquals("2\n 2  1 \n 3  0 \n", tw.toString())
   }
 }
