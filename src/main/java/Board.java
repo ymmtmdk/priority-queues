@@ -3,50 +3,49 @@ import java.util.*;
 
 public class Board {
   private class Blocks{
-    private final char[][] blocks;
+    final char[] blocks;
     final int dimension;
+
     Blocks(int[][] blocks){
       this.dimension = blocks.length;
       this.blocks = copy(blocks);
     }
 
-    Blocks(char[][] blocks){
-      this.dimension = blocks.length;
+    Blocks(char[] blocks, int dimension){
+      this.dimension = dimension;
       this.blocks = copy(blocks);
     }
 
     int get(int row, int col){
-      return blocks[row][col];
+      return blocks[row*dimension+col];
     }
 
     void set(int row, int col, int n){
-      blocks[row][col] = (char)n;
+      blocks[row*dimension+col] = (char)n;
     }
 
-    char[][] copy(int[][] blocks){
-      char[][] bl = new char[dimension][dimension];
+    char[] copy(int[][] blocks){
+      char[] bl = new char[dimension*dimension];
       for (int row = 0; row < dimension; row++){
         for (int col = 0; col < dimension; col++){
-          bl[row][col] = (char)blocks[row][col];
+          bl[row*dimension+col] = (char)blocks[row][col];
         }
       }
 
       return bl;
     }
 
-    char[][] copy(char[][] blocks){
-      char[][] bl = new char[dimension][dimension];
-      for (int row = 0; row < dimension; row++){
-        for (int col = 0; col < dimension; col++){
-          bl[row][col] = (char)blocks[row][col];
-        }
+    char[] copy(char[] blocks){
+      char[] bl = new char[blocks.length];
+      for (int i = 0; i < blocks.length; i++){
+        bl[i] = blocks[i];
       }
 
       return bl;
     }
 
     Blocks copy(){
-      return new Blocks(blocks);
+      return new Blocks(blocks, dimension);
     }
   }
 
