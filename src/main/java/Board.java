@@ -390,7 +390,7 @@ public class Board {
 
   public Iterable<Board> neighbors()
   {
-    Deque q = new ArrayDeque<Board>();
+    Deque<Board> q = new ArrayDeque<Board>();
     if (rowOfBlank > 0){
       q.add(neighbor(Dir.UP));
     }
