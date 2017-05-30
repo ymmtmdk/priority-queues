@@ -284,26 +284,26 @@ public class Board {
 
   public Board twin()                    // a board that is obtained by exchanging any pair of blocks
   {
-    int row1=-100;
-    int col1=-100;
-    int row2=-100;
-    int col2=-100;
+    int row1=0;
+    int col1=0;
+    int row2=0;
+    int col2=1;
     if (rowOfBlank == 0){
       row1 = 1;
-      col1 = 0;
       row2 = 1;
-      col2 = 1;
-    }
-    else{
-      row1 = 0;
-      col1 = 0;
-      row2 = 0;
-      col2 = 1;
     }
 
+    println(this);
+    assert(blocks.get(rowOfBlank, colOfBlank) == 0);
     assert(blocks.get(row1, col1) != 0);
     assert(blocks.get(row2, col2) != 0);
-    return exBoard(rowOfBlank, colOfBlank, row1, col1, row2, col2);
+    println("ex: "+ rowOfBlank + ":" + colOfBlank + ":" + row1);
+    Board bd = exBoard(rowOfBlank, colOfBlank, row1, col1, row2, col2);
+    println(bd);
+    assert(bd.blocks.get(rowOfBlank, colOfBlank) == 0);
+    assert(bd.blocks.get(row1, col1) != 0);
+    assert(bd.blocks.get(row2, col2) != 0);
+    return bd;
   }
 
   public boolean equals(Object other)        // does this board equal y?
@@ -339,8 +339,9 @@ public class Board {
     int nextHamming = hamming(n,  blocks.dimension, row1, col1);
     int newManhattan = manhattan - prevManhattan + nextManhattan;
     int newHamming = hamming - prevHamming + nextHamming;
-    long newHash = calcHash(hashCode, dimension, n, row2, col2, row1, col1);
-    Board bd = newBoard(blocks, blocks.dimension, row2, col2, newHamming, newManhattan, newManhattan==0, newHash);
+    long newHash = calcHash(row2, col2, row1, col1);
+    assert(newHash == calcHash());
+    Board bd = newBoard(blocks, blocks.dimension, row0, col0, newHamming, newManhattan, newManhattan==0, newHash);
     exchange(blocks, row1, col1, row2, col2);
 
     return bd;
@@ -368,24 +369,26 @@ public class Board {
         col = colOfBlank + 1;
         break;
     }
-    return exBoard(rowOfBlank, colOfBlank, rowOfBlank, colOfBlank, row, col);
+    return exBoard(row, col, rowOfBlank, colOfBlank, row, col);
   }
 
-  static private long calcHash(long hashCode, int dimension, int n, int rowOfBlank, int colOfBlank, int row, int col){
+  private long calcHash(int row1, int col1, int row2, int col2){
     /*
        1 2 6 24
        0,1,2,3
-       0+2+12+72
 
-       1,0,2,3
-       1+0+12+72
+       0,2,1,3
        */
 
-    int i = row*dimension+col; // 0
-    int j = rowOfBlank*dimension+colOfBlank; // 1
-    hashCode -= fact(j+1)*n; // fact(2)*1
-    hashCode += fact(i+1)*n; // fact(1)*1
-    return hashCode;
+    long r = hashCode;
+    int n = blocks.get(row1, col1);// 1
+    int m = blocks.get(row2, col2);// 2
+    int o = n - m;
+    int i = row1*dimension+col1+1; // 2
+    int j = row2*dimension+col2+1; // 3
+    r += fact(i)*o; // fact(2)*1
+    r -= fact(j)*o; // fact(1)*1
+    return r;
   }
 
   public Iterable<Board> neighbors()
