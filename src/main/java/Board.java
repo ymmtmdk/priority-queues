@@ -45,20 +45,17 @@ public class Board {
   private class LongBlocks extends Blocks<Long>{
     private long blocks;
     final int dimension;
-    // private final CharAryBlocks cab;
 
     LongBlocks(int[][] blocks){
       this.dimension = blocks.length;
       assert(dimension <= 4);
       this.blocks = copyInt(blocks);
-      // this.cab = new CharAryBlocks(blocks);
     }
 
     LongBlocks(long blocks, int dimension){
       this.dimension = dimension;
       assert(dimension <= 4);
       this.blocks = copyT(blocks);
-      // this.cab = new CharAryBlocks(copyAsInt());
     }
 
     int dimension(){
@@ -70,10 +67,7 @@ public class Board {
     }
 
     int get(int row, int col){
-      // println("get :"+str(blocks));
-      // println("idx :"+idx(row,col));
-      long n = (blocks >> (idx(row,col)*4)) & 0x0f;
-      // println("n   :"+n);
+      long n = (blocks >> ((row*dimension+col)*4)) & 0x0f;
       return (int)n;
     }
 
@@ -84,26 +78,9 @@ public class Board {
     void set(int row, int col, int n){
       assert(n<16);
       long l = n;
-      // println("row :"+row);
-      // println("col :"+col);
-      // println("n   :"+n);
-      // println("idx :"+idx(row,col));
-      long mask = ~(0x0fL << idx(row,col)*4);
-      long m = l << idx(row,col)*4;
-      // println("befo:"+str(blocks));
-      // println("mask:"+str(mask));
-      // println("m   :"+str(m));
+      long mask = ~(0x0fL << (row*dimension+col)*4);
+      long m = l << (row*dimension+col)*4;
       blocks = (blocks & mask) | m;
-      // println("afte:"+str(blocks));
-      // cab.set(row, col, n);
-
-      // if(cab.get(row,col) != get(row,col)){
-      // println("m   :"+str(m));
-      // println("get :"+get(row,col));
-      // println("afte:"+str(blocks));
-      // }
-      // assert(get(row,col) == n);
-      // assert(cab.get(row,col) == get(row,col));
     }
 
     Long copyInt(int[][] blocks){
@@ -112,8 +89,7 @@ public class Board {
       for (int row = 0; row < dimension; row++){
         for (int col = 0; col < dimension; col++){
           long l = blocks[row][col];
-          r += (l << (idx(row,col)*4));
-          // println(str(r));
+          r |= (l << (idx(row,col)*4));
         }
       }
       return r;
@@ -254,6 +230,7 @@ public class Board {
   // (where blocks[i][j] = block in row i, column j)
   public Board(int[][] bl)           // construct a board from an n-by-n array of blocks
   {
+    // this.blocks = new LongBlocks(bl);
     this.blocks = new LongBlocks(bl);
     this.dimension = blocks.dimension();
     this.rowOfBlank = calcBlank()[0];
