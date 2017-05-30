@@ -7,61 +7,7 @@ public class Solver {
     abstract int dist_between(BoardNode current, BoardNode neighbor);
 
     Deque<BoardNode> aStar(BoardNode start, BoardNode goal){
-      // The set of nodes already evaluated.
-      // Set<BoardNode> closedSet = new HashSet<BoardNode>();
       PriorityQueue<BoardNode> closedSet = new PriorityQueue<BoardNode>();
-      // The set of currently discovered nodes that are not evaluated yet.
-      // Initially, only the start node is known.
-      PriorityQueue<BoardNode> openSet = new PriorityQueue<BoardNode>();
-      openSet.add(start);
-      // For each node, which node it can most efficiently be reached from.
-      // If a node can be reached from many nodes, cameFrom will eventually contain the
-      // most efficient previous step.
-      // Map<BoardNode, BoardNode> cameFrom = new TreeMap<BoardNode, BoardNode>(); //the empty map
-
-      // For each node, the cost of getting from the start node to that node.
-      Map<BoardNode, Integer> gScore = new TreeMap<BoardNode, Integer>(); //map with default value of Infinity
-      // The cost of going from start to start is zero.
-      gScore.put(start, 0);
-      // For each node, the total cost of getting from the start node to the goal
-      // by passing by that node. That value is partly known, partly heuristic.
-      Map<BoardNode, Integer> fScore = new TreeMap<BoardNode, Integer>(); //map with default value of Infinity
-      // For the first node, that value is completely heuristic.
-      fScore.put(start, heuristic_cost_estimate(start, goal));
-
-      while (!openSet.isEmpty()){
-        BoardNode current = openSet.poll(); //the node in openSet having the lowest fScore[] value
-        if (current.equals(goal))
-          return path(current);
-
-        // openSet.Remove(current)
-        closedSet.add(current);
-        // println(current.board);
-        for (BoardNode neighbor : current.neighbors()){
-          if (closedSet.contains(neighbor)){
-            continue;		// Ignore the neighbor which is already evaluated.
-          }
-          // The distance from start to a neighbor
-          int tentative_gScore = gScore.get(current) + dist_between(current, neighbor);
-          if (!openSet.contains(neighbor)) // not in openSet	// Discover a new node
-            openSet.add(neighbor);
-          else if (gScore.containsKey(neighbor) && tentative_gScore >= gScore.get(neighbor)){
-            continue;		// This is not a better path.
-          }
-
-          // This path is the best until now. Record it!
-          // cameFrom.put(neighbor, current);
-          gScore.put(neighbor, tentative_gScore);
-          fScore.put(neighbor, gScore.get(neighbor) + heuristic_cost_estimate(neighbor, goal));
-        }
-      }
-
-      return null;
-    }
-
-    Deque<BoardNode> aStar3(BoardNode start, BoardNode goal){
-      PriorityQueue<BoardNode> closedSet = new PriorityQueue<BoardNode>();
-      // PriorityQueue<BoardNode> openSet = new PriorityQueue<BoardNode>(Comparator.reverseOrder());
       PriorityQueue<BoardNode> openSet = new PriorityQueue<BoardNode>();
       MinPQ<BoardNode> q = new MinPQ<BoardNode>();
       openSet.add(start);
@@ -121,7 +67,6 @@ public class Solver {
     private Board goal(){
       int n = board.dimension();
       int[][] blocks = new int[n][n];
-      // Board initial = new Board(blocks);
 
       for (int row = 0; row < n; row++){
         for (int col = 0; col < n; col++){
@@ -185,7 +130,7 @@ public class Solver {
     Deque<BoardNode> result;
     AStarSolver(Board start){
       BoardNode bn = new BoardNode(null, start, 0);
-      result = aStar3(bn, new BoardNode(null, bn.goal(), 0));
+      result = aStar(bn, new BoardNode(null, bn.goal(), 0));
     }
   }
 

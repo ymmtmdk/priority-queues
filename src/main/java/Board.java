@@ -13,24 +13,6 @@ public class Board {
 
   private static Map<Long, Board> blocksCache;
 
-  static Object fi(String name, int n) throws Throwable{
-    Method method = Board.class.getDeclaredMethod(name, int.class);
-    method.setAccessible(true);
-    return method.invoke(null, n);
-  }
-
-  static Object fii(String name, int n, int m ) throws Throwable{
-    Method method = Board.class.getDeclaredMethod(name, int.class, int.class);
-    method.setAccessible(true);
-    return method.invoke(null, n, m);
-  }
-
-  static Object fa(String name, int[][] a) throws Throwable{
-    Method method = Board.class.getDeclaredMethod(name, int[][].class);
-    method.setAccessible(true);
-    return method.invoke(null, a);
-  }
-
   private static Board newBoard(int[][] blocks, int dimension, int rowOfBlank, int colOfBlank, int hamming, int manhattan, boolean isGoal, long hashCode){
     if (blocksCache == null){
       blocksCache = new HashMap<Long, Board>();
@@ -51,8 +33,7 @@ public class Board {
     return r;
   }
 
-  static long calcHash(int [][] blocks){
-
+  private static long calcHash(int [][] blocks){
     long r = 0;
     for (int row = 0; row < blocks.length; row++){
       for (int col = 0; col < blocks.length; col++){
@@ -124,7 +105,6 @@ public class Board {
     this.isGoal = isGoal;
     this.hashCode = hashCode;
 
-    // assert(rowOfBlank == calcBlank(blocks)[0]);
     assert(blocks[rowOfBlank][colOfBlank] == 0);
   }
 
@@ -282,15 +262,10 @@ public class Board {
     exchange(bl, rowOfBlank, colOfBlank, row, col);
     int nextManhattan = manhattan(n, bl.length, rowOfBlank, colOfBlank);
     int nextHamming = hamming(n,  bl.length, rowOfBlank, colOfBlank);
-    // assert(manhattan - prevManhattan + nextManhattan == calcManhattan(bl));
     int newManhattan = manhattan - prevManhattan + nextManhattan;
     int newHamming = hamming - prevHamming + nextHamming;
-    // assert(newHamming == calcHamming(bl));
     long newHash = calcHash(hashCode, dimension, n, row, col, rowOfBlank, colOfBlank);
-    // assert(newHash == calcHash(bl));
     Board bd = newBoard(bl, bl.length, row, col, newHamming, newManhattan, newManhattan==0, newHash);
-    // Board bd = newBoard(blocks, row, col);
-    // Board bd = newBoard(bl, row, col);
     exchange(blocks, rowOfBlank, colOfBlank, row, col);
     return bd;
   }

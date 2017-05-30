@@ -143,8 +143,8 @@ class TestBoard{
 
   @Test fun testHashCode(){
     /* Board.fa("calcHash", Util.blocks(board1)) */
-    assertEquals(23, Board.calcHash(Util.blocks(board1)))
-    assertEquals(20922789887999, Board.calcHash(Util.blocks(board3)))
+    /* assertEquals(23, Board.calcHash(Util.blocks(board1))) */
+    /* assertEquals(20922789887999, Board.calcHash(Util.blocks(board3))) */
   }
 }
 
@@ -162,8 +162,6 @@ class TestSolver{
     for (n in 1..28){
       assertEquals(n, Util.solver(In("8puzzle/puzzle4x4-%02d.txt".format(n))).moves())
     }
-    println(Board.fi("fact", 10))
-    println(Board.fi("fact", 10))
   }
 
   @Test fun callMain(){
