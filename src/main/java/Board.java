@@ -48,7 +48,7 @@ public class Board {
     // return reduce(blocks, 7*blocks.length+3, (t, row, col, n) -> t * 23 + n);
   }
 
-
+/*
   private static <T> T reduce(int [][] bl, T t, CellReduce<T> ccb){
     for (int row = 0; row < bl.length; row++){
       for (int col = 0; col < bl.length; col++){
@@ -75,8 +75,21 @@ public class Board {
     return true;
   }
 
+  */
   static private int[] calcBlank(int[][] blocks){
     int[] point = new int[2];
+    int dimension = blocks.length;
+    for (int row = 0; row < dimension; row++){
+      for (int col = 0; col < dimension; col++){
+        int n = blocks[row][col];
+        if (n == 0){
+          point[0] = row;
+          point[1] = col;
+          return point;
+        }
+      }
+    }
+/*
     count(blocks, (row, col, n) -> {
       if (n == 0){
         point[0] = row;
@@ -86,6 +99,7 @@ public class Board {
       return false;
     });
 
+    */
     return point;
   }
 
@@ -150,7 +164,15 @@ public class Board {
 
   static private int calcHamming(int[][] blocks)                   // number of blocks out of place
   {
-    return count(blocks, (row, col, n) -> hamming(n, blocks.length, row, col)!=0);
+    int m = 0;
+    for (int row = 0; row < blocks.length; row++){
+      for (int col = 0; col < blocks.length; col++){
+        int n = blocks[row][col];
+        m += hamming(n, blocks.length, row, col);
+      }
+    }
+    return m;
+    // return count(blocks, (row, col, n) -> hamming(n, blocks.length, row, col)!=0);
   }
 
   static private void println(Object o){
@@ -186,7 +208,15 @@ public class Board {
 
   static private int calcManhattan(int[][] blocks)                 // sum of Manhattan distances between blocks and goal
   {
-    return reduce(blocks, 0, (t, row, col, n) -> t + manhattan(n, blocks.length, row, col));
+    int m = 0;
+    for (int row = 0; row < blocks.length; row++){
+      for (int col = 0; col < blocks.length; col++){
+        int n = blocks[row][col];
+        m += manhattan(n, blocks.length, row, col);
+      }
+    }
+    return m;
+    // return reduce(blocks, 0, (t, row, col, n) -> t + manhattan(n, blocks.length, row, col));
   }
 
   public int manhattan()                 // sum of Manhattan distances between blocks and goal
@@ -195,7 +225,18 @@ public class Board {
   }
 
   static private boolean calcIsGoal(int[][] blocks){
-    return all(blocks, (row, col, n) -> correctNumber(blocks.length, row, col) == n);
+    int dimension = blocks.length;
+    for (int row = 0; row < dimension; row++){
+      for (int col = 0; col < dimension; col++){
+        int n = blocks[row][col];
+        if (correctNumber(dimension, row, col) != n){
+          return false;
+        }
+      }
+    }
+
+    return true;
+    // return all(blocks, (row, col, n) -> correctNumber(blocks.length, row, col) == n);
   }
 
   public boolean isGoal()                // is this board the goal board?
@@ -306,9 +347,18 @@ public class Board {
     return q;
   }
 
-  static String blocksString(int[][] blocks){
+  private static String blocksString(int[][] blocks){
     StringBuilder s = new StringBuilder();
-    s.append(blocks.length + "\n");
+    int n = blocks.length;
+    s.append(n + "\n");
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            s.append(String.format("%2d ", blocks[i][j]));
+        }
+        s.append("\n");
+    }
+    return s.toString();
+    /*
     s = reduce(blocks, s, (s_, row, col, n)->{
       s_.append(String.format("%2d ", n));
       if (col == blocks.length-1){
@@ -317,6 +367,7 @@ public class Board {
       return s_;
     });
     return s.toString();
+    */
   }
 
   public String toString()               // string representation of this board (in the output format specified below)

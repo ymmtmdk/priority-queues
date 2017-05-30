@@ -157,11 +157,12 @@ public class Solver {
       if (other.getClass() != this.getClass()) return false;
       BoardNode that = (BoardNode) other;
       if (id == that.id) return true;
+      // if (moves != that.moves) return false;
       if (!board.equals(that.board)) return false;
-      if (moves != that.moves) return false;
       // if (board.hamming() != that.board.hamming()) return false;
       return true;
     }
+
     public String toString(){
       StringBuilder s = new StringBuilder();
       s.append("priority  = " + priority() + "\n");
