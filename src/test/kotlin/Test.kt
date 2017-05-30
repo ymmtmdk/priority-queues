@@ -156,6 +156,8 @@ class TestSolver{
     assertNotEquals(bd, tw)
     val sl = Solver(tw);
     assertEquals(false, sl.isSolvable())
+    assertEquals(false, Util.solver(In("8puzzle/puzzle2x2-unsolvable1.txt")).isSolvable())
+    assertEquals(false, Util.solver(In("8puzzle/puzzle3x3-unsolvable1.txt")).isSolvable())
   }
 
   @Test fun testSolver(){

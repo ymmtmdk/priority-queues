@@ -3,9 +3,6 @@ import java.util.*;
 
 public class Solver {
   abstract private class AStar{
-    abstract int heuristic_cost_estimate(BoardNode start, BoardNode goal);
-    abstract int dist_between(BoardNode current, BoardNode neighbor);
-
     private class PriorityComparator implements Comparator<BoardNode>{
       public int compare(BoardNode a, BoardNode b){
         return a.priority() - b.priority();
@@ -48,7 +45,7 @@ public class Solver {
       return null;
     }
 
-    Deque<BoardNode> aStar5(BoardNode start, BoardNode goal, BoardNode goal2){
+    Deque<BoardNode> aStar(BoardNode start, BoardNode goal, BoardNode goal2){
       // Set<BoardNode> closedSet = new PriorityQueue<BoardNode>();
       PriorityQueue<BoardNode> closedSet = new PriorityQueue<BoardNode>();
       // PriorityQueue<BoardNode> openSet = new PriorityQueue<BoardNode>();
@@ -79,7 +76,7 @@ public class Solver {
       return null;
     }
 
-    Deque<BoardNode> aStar(BoardNode start, BoardNode goal){
+    Deque<BoardNode> aStar5(BoardNode start, BoardNode goal){
       PriorityQueue<BoardNode> closedSet = new PriorityQueue<BoardNode>();
       MinPQ<BoardNode> q = new MinPQ<BoardNode>(new PriorityComparator());
       q.insert(start);
@@ -147,8 +144,8 @@ public class Solver {
       this.board = board;
       this.id = _node_id++;
       this.moves = moves;
-      if (id > 100000){
-        throw new ArithmeticException();
+      if (id > 200000){
+        // throw new ArithmeticException();
       }
 
       this.priority = moves + board.manhattan();
@@ -195,6 +192,8 @@ public class Solver {
   }
 
   private class AStarSolver extends AStar{
+    final Deque<BoardNode> result;
+
     private Board goal(Board board){
       int n = board.dimension();
       int[][] blocks = new int[n][n];
@@ -208,20 +207,11 @@ public class Solver {
       return new Board(blocks);
     }
 
-    int heuristic_cost_estimate(BoardNode start, BoardNode goal){
-      return start.priority();
-    }
-    int dist_between(BoardNode current, BoardNode neighbor){
-      return current.priority();
-    }
-
-    Deque<BoardNode> result;
     AStarSolver(Board start){
       BoardNode bd = new BoardNode(null, start, 0);
       BoardNode gl = new BoardNode(null, goal(start), 0);
       BoardNode gl2 = new BoardNode(null, goal(start).twin(), 0);
-
-      result = aStar5(bd, gl, gl2);
+      result = aStar(bd, gl, gl2);
     }
   }
 
