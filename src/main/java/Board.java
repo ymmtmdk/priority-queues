@@ -230,8 +230,7 @@ public class Board {
   // (where blocks[i][j] = block in row i, column j)
   public Board(int[][] bl)           // construct a board from an n-by-n array of blocks
   {
-    // this.blocks = new LongBlocks(bl);
-    this.blocks = new LongBlocks(bl);
+    this.blocks = bl.length <= 4 ? new LongBlocks(bl) : new CharAryBlocks(bl);
     this.dimension = blocks.dimension();
     this.rowOfBlank = calcBlank()[0];
     this.colOfBlank = calcBlank()[1];
@@ -384,6 +383,7 @@ public class Board {
     if (other == null) return false;
     if (other.getClass() != this.getClass()) return false;
     Board that = (Board) other;
+    /*
     if (hashCode == that.hashCode){
       // println("" + rowOfBlank +", "+ that.rowOfBlank);
       assert(rowOfBlank == that.rowOfBlank);
@@ -392,6 +392,7 @@ public class Board {
       assert(manhattan == that.manhattan);
       assert(isGoal == that.isGoal);
     }
+    */
     return hashCode == that.hashCode;
   }
 

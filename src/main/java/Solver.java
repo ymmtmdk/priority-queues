@@ -46,7 +46,8 @@ public class Solver {
     }
 
     Deque<BoardNode> aStar(BoardNode start, BoardNode goal, BoardNode goal2){
-      // Set<BoardNode> closedSet = new PriorityQueue<BoardNode>();
+      // Set<BoardNode> closedSet = new TreeSet<BoardNode>();
+      // Set<BoardNode> closedSet = new TreeSet<BoardNode>();
       PriorityQueue<BoardNode> closedSet = new PriorityQueue<BoardNode>();
       // PriorityQueue<BoardNode> openSet = new PriorityQueue<BoardNode>();
       MinPQ<BoardNode> q = new MinPQ<BoardNode>(new PriorityComparator());
@@ -148,7 +149,7 @@ public class Solver {
         // throw new ArithmeticException();
       }
 
-      this.priority = moves + board.manhattan();
+      this.priority = (moves + board.manhattan());
     }
 
     public BoardNode prevNode(){
@@ -171,6 +172,7 @@ public class Solver {
       if (board.equals(that.board)){
         return 0;
       }
+      // return priority - that.priority;
       return id - that.id;
     }
 
