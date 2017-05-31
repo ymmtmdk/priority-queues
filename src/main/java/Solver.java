@@ -46,9 +46,8 @@ public class Solver {
     }
 
     Deque<BoardNode> aStar(BoardNode start, BoardNode goal, BoardNode goal2){
-      // Set<BoardNode> closedSet = new TreeSet<BoardNode>();
-      // Set<BoardNode> closedSet = new TreeSet<BoardNode>();
-      PriorityQueue<BoardNode> closedSet = new PriorityQueue<BoardNode>();
+      Set<BoardNode> closedSet = new TreeSet<BoardNode>();
+      // PriorityQueue<BoardNode> closedSet = new PriorityQueue<BoardNode>();
       // PriorityQueue<BoardNode> openSet = new PriorityQueue<BoardNode>();
       MinPQ<BoardNode> q = new MinPQ<BoardNode>(new PriorityComparator());
       // openSet.add(start);
@@ -71,6 +70,59 @@ public class Solver {
               q.insert(neighbor);
             }
           }
+        }
+      }
+
+      return null;
+    }
+
+    Deque<BoardNode> aStarOpenSet(BoardNode start, BoardNode goal, BoardNode goal2){
+      // PriorityQueue<BoardNode> closedSet = new PriorityQueue<BoardNode>();
+      PriorityQueue<BoardNode> openSet = new PriorityQueue<BoardNode>();
+      Set<BoardNode> closedSet = new TreeSet<BoardNode>();
+      // Set<BoardNode> openSet = new TreeSet<BoardNode>();
+      MinPQ<BoardNode> q = new MinPQ<BoardNode>(new PriorityComparator());
+      openSet.add(start);
+      q.insert(start);
+
+      while (!q.isEmpty()){
+        BoardNode item = openSet.poll();
+        BoardNode current = q.delMin();
+        if (current.board.equals(goal.board))
+          return path(current);
+        if (current.board.equals(goal2.board))
+          return null;
+
+        closedSet.add(current);
+        for (BoardNode neighbor : current.neighbors()){
+          if (!closedSet.contains(neighbor) && !openSet.contains(neighbor)){
+          // if (!closedSet.contains(neighbor)){
+            if (current.prevNode() == null || !current.prevNode().board.equals(neighbor.board)){
+              openSet.add(neighbor);
+              q.insert(neighbor);
+            }
+          }
+        }
+      }
+
+      return null;
+    }
+
+    Deque<BoardNode> aStarNoSet(BoardNode start, BoardNode goal, BoardNode goal2){
+      MinPQ<BoardNode> q = new MinPQ<BoardNode>(new PriorityComparator());
+      q.insert(start);
+
+      while (!q.isEmpty()){
+        BoardNode current = q.delMin();
+        if (current.board.equals(goal.board))
+          return path(current);
+        if (current.board.equals(goal2.board))
+          return null;
+
+        for (BoardNode neighbor : current.neighbors()){
+            if (current.prevNode() == null || !current.prevNode().board.equals(neighbor.board)){
+              q.insert(neighbor);
+            }
         }
       }
 
@@ -210,6 +262,8 @@ public class Solver {
       BoardNode gl = new BoardNode(null, goal(start), 0);
       BoardNode gl2 = new BoardNode(null, goal(start).twin(), 0);
       result = aStar(bd, gl, gl2);
+      // result = aStarOpenSet(bd, gl, gl2);
+      // result = aStarNoSet(bd, gl, gl2);
     }
   }
 
