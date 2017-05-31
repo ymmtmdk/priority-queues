@@ -5,7 +5,7 @@ public class Solver {
   abstract private class AStar{
     private class PriorityComparator implements Comparator<BoardNode>{
       public int compare(BoardNode a, BoardNode b){
-        return a.priority() - b.priority();
+        return Integer.compare(a.priority,  b.priority);
       }
     }
 
@@ -164,10 +164,6 @@ public class Solver {
       return q;
     }
 
-    private int priority(){
-      return priority;
-    }
-
     public int compareTo(BoardNode that){
       if (board.equals(that.board)){
         return 0;
@@ -185,7 +181,7 @@ public class Solver {
 
     public String toString(){
       StringBuilder s = new StringBuilder();
-      s.append("priority  = " + priority() + "\n");
+      s.append("priority  = " + priority + "\n");
       s.append("moves     = " + moves + "\n");
       s.append("manhattan = " + board.manhattan() + "\n");
       s.append(board.toString());

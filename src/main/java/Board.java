@@ -174,6 +174,7 @@ public class Board {
 
     Board bd = new Board(blocks.dup(), dimension, rowOfBlank, colOfBlank, hamming, manhattan, isGoal, hashCode);
     // bd.testBlocks();
+    // bd.testMahattan2();
     boardCache.put(hashCode, bd);
     return bd;
   }
@@ -313,6 +314,137 @@ public class Board {
     return Math.abs(row-correntRowOfN)+Math.abs(col-correntColOfN);
   }
 
+  private boolean isInCorrectRow(int row, int col){
+    return correctDistRow(row, col) == 0;
+  }
+
+  private boolean isInCorrectCol(int row, int col){
+    return correctDistCol(row, col) == 0;
+  }
+
+  private int correctDistRow(int row, int col){
+    int n = blocks.get(row, col);
+    int correntRowOfN = (n-1) / dimension;
+    return correntRowOfN - row;
+  }
+
+  private int correctDistCol(int row, int col){
+    int n = blocks.get(row, col);
+    int correntColOfN = (n-1) % dimension;
+    return correntColOfN - col;
+  }
+
+  private int manhattan2(int row, int col){
+    int n = blocks.get(row, col);
+    if (n == 0){
+      return 0;
+    }
+
+   /*
+      3 1 8    1 2 3
+      7   2    4 5 6
+      4 5 6    7 8
+*/
+
+    int distRow = 0;
+    int distCol = 0;
+
+    int lineConflict = 0;
+    int correntRowOfN = (n-1) / dimension;
+    int correntColOfN = (n-1) % dimension;
+    distRow = correctDistRow(row, col);
+    distCol = correctDistCol(row, col);
+    if (distRow == 0){
+      if (distCol > 0){
+        // n = 3
+        // row = 0
+        // col = 0
+        // correntRowOfN = 0
+        // correntColOfN = 2
+        // distRow = 0
+        // distCol = 2-0
+
+        // c = 0+1; c <= 2;
+        for (int c = col+1; c <= correntColOfN; c++){
+          if (isInCorrectRow(row, c)){ // 1 is in correntRowOfN
+            if (correctDistCol(row, c) <= 0) // correctDistCol = -1
+            {
+              lineConflict += 1;
+            }
+          }
+        }
+      }
+      if (distCol < 0){
+        /*
+           3 1 8    1 2 3
+           7   2    4 5 6
+           4 5 6    7 8
+           */
+        for (int c = col-1; c >= correntColOfN; c--){
+          if (isInCorrectRow(row, c) && correctDistCol(row, c) >= 0) // correctDistCol = -1
+          {
+            lineConflict += 1;
+          }
+        }
+      }
+    }
+    if (distCol == 0){
+      if (distRow > 0){
+        for (int r = row+1; r <= correntRowOfN; r++){
+          if (isInCorrectCol(r, col) && correctDistRow(r, col) <= 0){
+            lineConflict += 1;
+          }
+        }
+      }
+      if (distRow < 0){
+        for (int r = row-1; r >= correntRowOfN; r--){
+          if (isInCorrectCol(r, col) && correctDistRow(r, col) >= 0){
+            lineConflict += 1;
+          }
+        }
+      }
+    }
+
+    return Math.abs(distRow)+Math.abs(distCol)+lineConflict;
+  }
+
+  private static void testMahattan2(){
+    /*
+       3 1 8    1 2 3
+       7   2    4 5 6
+       4 5 6    7 8
+       */
+    int[][] bl = new int[3][3];
+    bl[0][0] = 3;
+    bl[0][1] = 1;
+    bl[0][2] = 8;
+    bl[1][0] = 7;
+    bl[1][1] = 0;
+    bl[1][2] = 2;
+    bl[2][0] = 4;
+    bl[2][1] = 6;
+    bl[2][2] = 5;
+    Board bd = new Board(bl);
+    assert(bd.correctDistCol(0,0) == 2);
+    assert(bd.correctDistCol(0,1) == -1);
+    assert(bd.correctDistRow(1,0) == 1);
+    assert(bd.correctDistRow(2,0) == -1);
+    assert(bd.isInCorrectRow(0,1));
+    assert(bd.isInCorrectRow(0,0));
+    assert(bd.isInCorrectRow(0,1));
+    assert(!bd.isInCorrectRow(0,2));
+    assert(bd.isInCorrectCol(1,0));
+    assert(bd.isInCorrectCol(2,0));
+    assert(!bd.isInCorrectCol(0,0));
+    assert(!bd.isInCorrectCol(0,1));
+    assert(bd.manhattan2(0,0) == 3);
+    assert(bd.manhattan2(0,1) == 2);
+    assert(bd.manhattan2(0,2) == 3);
+    assert(bd.manhattan2(1,0) == 2);
+    assert(bd.manhattan2(1,1) == 0);
+    assert(bd.manhattan2(2,0) == 2);
+  }
+
   private int calcManhattan()                 // sum of Manhattan distances between blocks and goal
   {
     int m = 0;
@@ -320,6 +452,18 @@ public class Board {
       for (int col = 0; col < blocks.dimension(); col++){
         int n = blocks.get(row, col);
         m += manhattan(n, blocks.dimension(), row, col);
+      }
+    }
+    return m;
+    // return reduce(blocks, 0, (t, row, col, n) -> t + manhattan(n, blocks.length, row, col));
+  }
+
+  private int calcManhattan2()                 // sum of Manhattan distances between blocks and goal
+  {
+    int m = 0;
+    for (int row = 0; row < blocks.dimension(); row++){
+      for (int col = 0; col < blocks.dimension(); col++){
+        m += manhattan2(row, col);
       }
     }
     return m;
@@ -384,15 +528,15 @@ public class Board {
     if (other.getClass() != this.getClass()) return false;
     Board that = (Board) other;
     /*
-    if (hashCode == that.hashCode){
-      // println("" + rowOfBlank +", "+ that.rowOfBlank);
-      assert(rowOfBlank == that.rowOfBlank);
-      assert(colOfBlank == that.colOfBlank);
-      assert(hamming == that.hamming);
-      assert(manhattan == that.manhattan);
-      assert(isGoal == that.isGoal);
-    }
-    */
+       if (hashCode == that.hashCode){
+    // println("" + rowOfBlank +", "+ that.rowOfBlank);
+    assert(rowOfBlank == that.rowOfBlank);
+    assert(colOfBlank == that.colOfBlank);
+    assert(hamming == that.hamming);
+    assert(manhattan == that.manhattan);
+    assert(isGoal == that.isGoal);
+       }
+       */
     return hashCode == that.hashCode;
   }
 
@@ -410,10 +554,11 @@ public class Board {
     exchange(row1, col1, row2, col2);
     int nextManhattan = manhattan(n, blocks.dimension(), row1, col1);
     int nextHamming = hamming(n,  blocks.dimension(), row1, col1);
-    int newManhattan = manhattan - prevManhattan + nextManhattan;
+    // int newManhattan = manhattan - prevManhattan + nextManhattan;
+    int newManhattan = calcManhattan2();
     int newHamming = hamming - prevHamming + nextHamming;
     long newHash = calcHash(row2, col2, row1, col1);
-    assert(newHash == calcHash());
+    // assert(newHash == calcHash());
     Board bd = newBoard(blocks, blocks.dimension(), row0, col0, newHamming, newManhattan, newManhattan==0, newHash);
     exchange(row1, col1, row2, col2);
 
