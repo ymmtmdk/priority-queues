@@ -620,9 +620,15 @@ public class Board {
     return r;
   }
 
+    private class PriorityComparator implements Comparator<Board>{
+      public int compare(Board a, Board b){
+        return Integer.compare(a.manhattan,  b.manhattan);
+      }
+    }
+
   public Iterable<Board> neighbors()
   {
-    Deque<Board> q = new ArrayDeque<Board>();
+    PriorityQueue<Board> q = new PriorityQueue<Board>(new PriorityComparator());
     if (rowOfBlank > 0){
       q.add(neighbor(Dir.UP));
     }
