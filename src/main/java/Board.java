@@ -186,6 +186,21 @@ public class Board {
     return r;
   }
 
+  private long calcHash0(){
+    long r = 7*blocks.dimension+3;
+    for (int row = 0; row < blocks.dimension(); row++){
+      for (int col = 0; col < blocks.dimension(); col++){
+        int n = blocks.get(row, col);
+        r *= 23;
+        r += n;
+      }
+    }
+
+    // assert(r > 0);
+    return r;
+    // return reduce(blocks, 7*blocks.length+3, (t, row, col, n) -> t * 23 + n);
+  }
+
   private long calcHash(){
     long r = 0;
     for (int row = 0; row < blocks.dimension(); row++){
@@ -239,7 +254,7 @@ public class Board {
     this.hamming = calcHamming();
     this.manhattan = calcManhattan();
     this.isGoal = calcIsGoal();
-    this.hashCode = calcHash();
+    this.hashCode = calcHash0();
   }
 
   private Board(CharAryBlocks blocks, int dimension, int rowOfBlank, int colOfBlank, int hamming, int manhattan, boolean isGoal, long hashCode){
@@ -532,7 +547,7 @@ public class Board {
     assert(isGoal == that.isGoal);
        }
        */
-    return hashCode == that.hashCode;
+    return hashCode == that.hashCode && manhattan == that.manhattan;
   }
 
   private void exchange(int row1, int col1, int row2 ,int col2){
@@ -552,7 +567,8 @@ public class Board {
     // int newManhattan = manhattan - prevManhattan + nextManhattan;
     int newManhattan = calcManhattan2();
     int newHamming = hamming - prevHamming + nextHamming;
-    long newHash = calcHash(row2, col2, row1, col1);
+    // long newHash = calcHash(row2, col2, row1, col1);
+    long newHash = calcHash0();
     // assert(newHash == calcHash());
     Board bd = newBoard(blocks, blocks.dimension(), row0, col0, newHamming, newManhattan, newManhattan==0, newHash);
     exchange(row1, col1, row2, col2);

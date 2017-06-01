@@ -93,6 +93,13 @@ class TestBoard{
   13 14 15 0
   """
 
+  val board4 = """
+  3
+  0  4  6
+  3  2  5
+  8  7  1
+  """
+
   @Test fun testToString(){
     /* val brd = board(simpleBoard()) */
     /* val str = "2\n 1  2\n 3  0\n" */
@@ -126,6 +133,14 @@ class TestBoard{
     /* Board.fa("calcHash", Util.blocks(board1)) */
     /* assertEquals(23, Board.calcHash(Util.blocks(board1))) */
     /* assertEquals(20922789887999, Board.calcHash(Util.blocks(board3))) */
+  }
+
+  @Test fun testNeighbors(){
+    val b1 = Util.board(board4)
+    /* assertEquals(0, b1.neighbors()) */
+    val b2 = Util.board(In("8puzzle/puzzle00.txt"))
+    /* assertEquals(0, b2.neighbors()) */
+
   }
 }
 
@@ -165,14 +180,8 @@ class TestSolver{
     }
   }
 
-  fun callMain(){
+  @Test fun callMain(){
     Solver.main(arrayOf("8puzzle/puzzle00.txt"))
-    Solver.main(arrayOf("8puzzle/puzzle2x2-00.txt"))
-    Solver.main(arrayOf("8puzzle/puzzle2x2-01.txt"))
-    Solver.main(arrayOf("8puzzle/puzzle2x2-02.txt"))
-    Solver.main(arrayOf("8puzzle/puzzle3x3-00.txt"))
-    Solver.main(arrayOf("8puzzle/puzzle04.txt"))
-    Solver.main(arrayOf("8puzzle/puzzle4x4-01.txt"))
     /* Solver.main(arrayOf("8puzzle/puzzle4x4-44.txt")) */
   }
 }
