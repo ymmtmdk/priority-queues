@@ -181,7 +181,7 @@ class TestSolver{
   }
 
   @Test fun callMain(){
-    Solver.main(arrayOf("8puzzle/puzzle00.txt"))
-    /* Solver.main(arrayOf("8puzzle/puzzle4x4-44.txt")) */
+    /* Solver.main(arrayOf("8puzzle/puzzle00.txt")) */
+    Solver.main(arrayOf("8puzzle/puzzle4x4-02.txt"))
   }
 }

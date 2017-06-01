@@ -9,35 +9,61 @@ public class Solver {
       }
     }
 
-    Deque<BoardNode> aStar4(BoardNode start, BoardNode goal){
+    private class ReversePriorityComparator implements Comparator<BoardNode>{
+      public int compare(BoardNode a, BoardNode b){
+        return Integer.compare(b.priority,  a.priority);
+      }
+    }
+
+    Deque<BoardNode> aStar4(BoardNode start, BoardNode goal, BoardNode goal2){
       PriorityQueue<BoardNode> closedSet = new PriorityQueue<BoardNode>();
       PriorityQueue<BoardNode> closedSet2 = new PriorityQueue<BoardNode>();
       MinPQ<BoardNode> q = new MinPQ<BoardNode>();
-      MinPQ<BoardNode> q2 = new MinPQ<BoardNode>();
+      MinPQ<BoardNode> q2 = new MinPQ<BoardNode>(new ReversePriorityComparator());
       q.insert(start);
       q2.insert(goal);
 
-      while (!q.isEmpty()){
+      while (!q.isEmpty() && !q2.isEmpty()){
         BoardNode current = q.delMin();
         BoardNode current2 = q2.delMin();
+
         if (current.board.equals(goal.board))
           return path(current);
+        if (current.board.equals(goal2.board))
+          return null;
+        if (current2.board.equals(goal2.board))
+          return null;
 
         closedSet.add(current);
         closedSet2.add(current2);
 
-        if (closedSet.contains(current2) || closedSet2.contains(current)){
-          return path(current, current2);
+        if (closedSet.contains(current2)){
+          for (BoardNode n : closedSet){
+            if (n.equals(current2)){
+              return path(n, current2);
+            }
+          }
+        }
+        if (closedSet2.contains(current)){
+          for (BoardNode n : closedSet2){
+            if (n.equals(current)){
+              return path(current, n);
+            }
+          }
         }
 
         for (BoardNode neighbor : current.neighbors()){
           if (!closedSet.contains(neighbor)){
-            q.insert(neighbor);
+            if (current.prevNode() == null || !current.prevNode().board.equals(neighbor.board)){
+              q.insert(neighbor);
+            }
           }
         }
         for (BoardNode neighbor : current2.neighbors()){
           if (!closedSet2.contains(neighbor)){
-            q2.insert(neighbor);
+            if (current2.prevNode() == null || !current2.prevNode().board.equals(neighbor.board)){
+              q2.insert(neighbor);
+            }
           }
         }
       }
@@ -96,7 +122,7 @@ public class Solver {
         closedSet.add(current);
         for (BoardNode neighbor : current.neighbors()){
           if (!closedSet.contains(neighbor) && !openSet.contains(neighbor)){
-          // if (!closedSet.contains(neighbor)){
+            // if (!closedSet.contains(neighbor)){
             if (current.prevNode() == null || !current.prevNode().board.equals(neighbor.board)){
               openSet.add(neighbor);
               q.insert(neighbor);
@@ -120,9 +146,9 @@ public class Solver {
           return null;
 
         for (BoardNode neighbor : current.neighbors()){
-            if (current.prevNode() == null || !current.prevNode().board.equals(neighbor.board)){
-              q.insert(neighbor);
-            }
+          if (current.prevNode() == null || !current.prevNode().board.equals(neighbor.board)){
+            q.insert(neighbor);
+          }
         }
       }
 
@@ -154,17 +180,14 @@ public class Solver {
     Deque<BoardNode> path(BoardNode current, BoardNode current2){
       BoardNode current22 = current2;
       Deque<BoardNode> total_path = new ArrayDeque<BoardNode>();
-      total_path.addFirst(current2);
-      while (current2.prevNode() != null){
-        current2 = current2.prevNode();
-        total_path.addFirst(current2);
-      }
-      if (!current.board.equals(current22.board)){
-        total_path.addLast(current);
-      }
+      total_path.addLast(current);
       while (current.prevNode() != null){
         current = current.prevNode();
         total_path.addLast(current);
+      }
+      while (current2.prevNode() != null){
+        current2 = current2.prevNode();
+        total_path.addFirst(current2);
       }
       return total_path;
     }
@@ -202,6 +225,7 @@ public class Solver {
       }
 
       this.priority = (moves + board.manhattan());
+      // this.priority = 0;
     }
 
     public BoardNode prevNode(){
@@ -261,7 +285,8 @@ public class Solver {
       BoardNode bd = new BoardNode(null, start, 0);
       BoardNode gl = new BoardNode(null, goal(start), 0);
       BoardNode gl2 = new BoardNode(null, goal(start).twin(), 0);
-      result = aStar(bd, gl, gl2);
+      // result = aStar(bd, gl, gl2);
+      result = aStar4(bd, gl, gl2);
       // result = aStarOpenSet(bd, gl, gl2);
       // result = aStarNoSet(bd, gl, gl2);
     }
