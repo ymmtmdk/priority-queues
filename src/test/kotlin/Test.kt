@@ -6,7 +6,7 @@ import org.hamcrest.Matchers.*
 /* import org.hamcrest.text.* */
 
 class TestPQ{
-  @Test fun test(){
+   fun test(){
     val q = MaxPQ<Int>(1000)
     /* val q = edu.princeton.cs.algs4.MaxPQ<Int>(1000) */
     assertEquals(0, q.size())
@@ -100,13 +100,13 @@ class TestBoard{
   8  7  1
   """
 
-  @Test fun testToString(){
+   fun testToString(){
     /* val brd = board(simpleBoard()) */
     /* val str = "2\n 1  2\n 3  0\n" */
     /* assertEquals(str, brd.toString()) */
   }
 
-  @Test fun testEquals(){
+   fun testEquals(){
     val b1 = Util.board(board1)
     val b2 = Util.board(board1)
     assertEquals(b1, b2)
@@ -114,28 +114,28 @@ class TestBoard{
     assertNotEquals(b1, 1)
   }
 
-  @Test fun testHamming(){
+   fun testHamming(){
     assertEquals(0, Util.board(board1).hamming())
     assertEquals(5, Util.board(board2).hamming())
   }
 
-  @Test fun testManhattan(){
+   fun testManhattan(){
     assertEquals(0, Util.board(board1).manhattan())
     assertEquals(10, Util.board(board2).manhattan())
   }
 
-  @Test fun testIsGoard(){
+   fun testIsGoard(){
     assertEquals(true, Util.board(board1).isGoal())
     assertEquals(false, Util.board(board2).isGoal())
   }
 
-  @Test fun testHashCode(){
+   fun testHashCode(){
     /* Board.fa("calcHash", Util.blocks(board1)) */
     /* assertEquals(23, Board.calcHash(Util.blocks(board1))) */
     /* assertEquals(20922789887999, Board.calcHash(Util.blocks(board3))) */
   }
 
-  @Test fun testNeighbors(){
+   fun testNeighbors(){
     val b1 = Util.board(board4)
     /* assertEquals(0, b1.neighbors()) */
     val b2 = Util.board(In("8puzzle/puzzle00.txt"))
@@ -145,7 +145,7 @@ class TestBoard{
 }
 
 class TestSolver{
-  @Test fun testTwin(){
+   fun testTwin(){
     val bd = Util.board(In("8puzzle/puzzle2x2-00.txt"))
     val tw = bd.twin()
     assertEquals(tw, tw)
@@ -165,24 +165,24 @@ class TestSolver{
     /* assertEquals(false, Util.solver(In("8puzzle/puzzle3x3-unsolvable1.txt")).isSolvable()) */
   }
 
-  @Test fun testSolver(){
+   @Test fun testSolver(){
     val sl = Util.solver(In("8puzzle/puzzle2x2-00.txt"))
     assertEquals(true, sl.isSolvable())
     assertEquals(0, sl.moves())
     for (n in 1..6){
       assertEquals(n, Util.solver(In("8puzzle/puzzle2x2-%02d.txt".format(n))).moves())
     }
-    for (n in 2..28){
+    for (n in 1..26){
       assertEquals(n, Util.solver(In("8puzzle/puzzle3x3-%02d.txt".format(n))).moves())
     }
-    for (n in 1..31){
-      /* assertEquals(n, Util.solver(In("8puzzle/puzzle4x4-%02d.txt".format(n))).moves()) */
+    for (n in 1..21){
+      assertEquals(n, Util.solver(In("8puzzle/puzzle4x4-%02d.txt".format(n))).moves())
     }
   }
 
-  @Test fun callMain(){
-    /* Solver.main(arrayOf("8puzzle/puzzle00.txt")) */
-    Solver.main(arrayOf("8puzzle/puzzle2x2-04.txt"))
-    Solver.main(arrayOf("8puzzle/puzzle4x4-02.txt"))
+   @Test fun callMain(){
+    Solver.main(arrayOf("8puzzle/puzzle00.txt"))
+    Solver.main(arrayOf("8puzzle/puzzle2x2-02.txt"))
+    /* Solver.main(arrayOf("8puzzle/puzzle4x4-02.txt")) */
   }
 }

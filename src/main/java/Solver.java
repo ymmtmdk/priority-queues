@@ -21,6 +21,55 @@ public class Solver {
       }
     }
 
+    /*
+    function IDDFS(node)
+    for (depth = 0; ; depth++)
+        found = DLS(node, depth)
+        if (found != NULL) then
+            return found
+function DLS(node, depth)
+    if (IS_GOAL(node)) then
+        return node
+    if (depth > 0) then
+        for each (child in EXPAND(node))
+            found = DLS(child, depth - 1)
+            if (found != NULL) then
+                return found
+    return NULL
+    */
+
+    Deque<BoardNode> iddfs(BoardNode start, BoardNode goal, BoardNode goal2){
+      for (int depth = 0; ; depth++){
+        BoardNode found = dls(start, depth, goal, goal2);
+        if (found != null){
+          if (found.equals(goal2)){
+            return null;
+          }
+          return path(found);
+        }
+      }
+    }
+
+    BoardNode dls(BoardNode node, int depth, BoardNode goal, BoardNode goal2){
+      if (node.equals(goal) || node.equals(goal2)){
+        return node;
+      }
+      if (depth <= 0){
+        return null;
+      }
+      if (node.priority > depth){
+        return null;
+      }
+      for (BoardNode neighbor : node.neighbors()){
+        if (!node.isCritical(neighbor)){
+          BoardNode found = dls(neighbor, depth-1, goal, goal2);
+          if (found != null){
+            return found;
+          }
+        }
+      }
+      return null;
+    }
     Deque<BoardNode> aStarDual(BoardNode start, BoardNode goal, BoardNode goal2){
       TreeSet<BoardNode> closedSet = new TreeSet<BoardNode>();
       TreeSet<BoardNode> closedSet2 = new TreeSet<BoardNode>();
@@ -90,7 +139,7 @@ public class Solver {
         closedSet.add(current);
         for (BoardNode neighbor : current.neighbors()){
           if (!closedSet.contains(neighbor)){
-            if (current.prevNode() == null || !current.prevNode().board.equals(neighbor.board)){
+            if (!current.isCritical(neighbor)){
               q.insert(neighbor);
             }
           }
@@ -240,6 +289,10 @@ public class Solver {
       return q;
     }
 
+    public boolean isCritical(BoardNode that){
+      return prevNode() != null && prevNode().board.equals(that.board);
+
+    }
     public int compareTo(BoardNode that){
       if (board.equals(that.board)){
         return 0;
@@ -285,7 +338,8 @@ public class Solver {
       BoardNode bd = new BoardNode(null, start, 0);
       BoardNode gl = new BoardNode(null, goal(start), 0);
       BoardNode gl2 = new BoardNode(null, goal(start).twin(), 0);
-      result = aStar(bd, gl, gl2);
+      // result = aStar(bd, gl, gl2);
+      result = iddfs(bd, gl, gl2);
       // result = aStarDual(bd, gl, gl2);
       // result = aStarOpenSet(bd, gl, gl2);
       // result = aStarNoSet(bd, gl, gl2);
