@@ -158,13 +158,13 @@ public class Board {
   private enum Dir{ UP, DOWN, LEFT, RIGHT };
   private final int dimension, manhattan, hamming;
   private final boolean isGoal;
-  private final Blocks blocks;
+  private final CharAryBlocks blocks;
   private final int rowOfBlank, colOfBlank;
   private final long hashCode;
 
   private static Map<Long, Board> boardCache;
 
-  private static Board newBoard(Blocks blocks, int dimension, int rowOfBlank, int colOfBlank, int hamming, int manhattan, boolean isGoal, long hashCode){
+  private static Board newBoard(CharAryBlocks blocks, int dimension, int rowOfBlank, int colOfBlank, int hamming, int manhattan, boolean isGoal, long hashCode){
     if (boardCache == null){
       boardCache = new HashMap<Long, Board>();
     }
@@ -231,7 +231,8 @@ public class Board {
   // (where blocks[i][j] = block in row i, column j)
   public Board(int[][] bl)           // construct a board from an n-by-n array of blocks
   {
-    this.blocks = bl.length <= 4 ? new LongBlocks(bl) : new CharAryBlocks(bl);
+    // this.blocks = bl.length <= 4 ? new LongBlocks(bl) : new CharAryBlocks(bl);
+    this.blocks = new CharAryBlocks(bl);
     this.dimension = blocks.dimension();
     this.rowOfBlank = calcBlank()[0];
     this.colOfBlank = calcBlank()[1];
@@ -241,7 +242,7 @@ public class Board {
     this.hashCode = calcHash();
   }
 
-  private Board(Blocks blocks, int dimension, int rowOfBlank, int colOfBlank, int hamming, int manhattan, boolean isGoal, long hashCode){
+  private Board(CharAryBlocks blocks, int dimension, int rowOfBlank, int colOfBlank, int hamming, int manhattan, boolean isGoal, long hashCode){
     this.blocks = blocks;
     this.dimension = dimension;
     this.rowOfBlank = rowOfBlank;
@@ -621,7 +622,7 @@ public class Board {
     return q;
   }
 
-  private static String blocksString(Blocks blocks){
+  private static String blocksString(CharAryBlocks blocks){
     StringBuilder s = new StringBuilder();
     int n = blocks.dimension();
     s.append(n + "\n");

@@ -2,66 +2,59 @@ See the Assessment Guide for information on how to interpret this report.
 
 ASSESSMENT SUMMARY
 
-Compilation:  FAILED (0 errors, 6 warnings)
+Compilation:  FAILED (0 errors, 4 warnings)
 API:          PASSED
 
-Findbugs:     FAILED (7 warnings)
-Checkstyle:   FAILED (158 warnings)
+Findbugs:     FAILED (11 warnings)
+Checkstyle:   FAILED (298 warnings)
 
-Correctness:  30/42 tests passed
+Correctness:  37/42 tests passed
 Memory:       11/11 tests passed
-Timing:       12/17 tests passed
+Timing:       17/17 tests passed
 
-Aggregate score: 71.97%
+Aggregate score: 87.86%
 [Compilation: 5%, API: 5%, Findbugs: 0%, Checkstyle: 0%, Correctness: 60%, Memory: 10%, Timing: 20%]
 
 ASSESSMENT DETAILS
 
 The following files were submitted:
 ----------------------------------
- 12K May 30 08:39 Board.java
-7.7K May 30 08:39 Solver.java
+ 17K May 31 07:47 Board.java
+9.6K May 31 07:47 Solver.java
 
 
 ********************************************************************************
-*  COMPILING
+*  COMPILING                                                                    
 ********************************************************************************
 
 
 % javac Board.java
 *-----------------------------------------------------------
-Board.java:393: warning: [rawtypes] found raw type: Deque
-    Deque q = new ArrayDeque<Board>();
-    ^
-  missing type arguments for generic class Deque<E>
-  where E is a type-variable:
-    E extends Object declared in interface Deque
-Board.java:395: warning: [unchecked] unchecked call to add(E) as a member of the raw type Deque
-      q.add(neighbor(Dir.UP));
-           ^
-  where E is a type-variable:
-    E extends Object declared in interface Deque
-Board.java:398: warning: [unchecked] unchecked call to add(E) as a member of the raw type Deque
-      q.add(neighbor(Dir.DOWN));
-           ^
-  where E is a type-variable:
-    E extends Object declared in interface Deque
-Board.java:401: warning: [unchecked] unchecked call to add(E) as a member of the raw type Deque
-      q.add(neighbor(Dir.LEFT));
-           ^
-  where E is a type-variable:
-    E extends Object declared in interface Deque
-Board.java:404: warning: [unchecked] unchecked call to add(E) as a member of the raw type Deque
-      q.add(neighbor(Dir.RIGHT));
-           ^
-  where E is a type-variable:
-    E extends Object declared in interface Deque
-Board.java:406: warning: [unchecked] unchecked conversion
-    return q;
-           ^
-  required: Iterable<Board>
-  found:    Deque
-6 warnings
+Board.java:161: warning: [rawtypes] found raw type: Board.Blocks
+  private final Blocks blocks;
+                ^
+  missing type arguments for generic class Board.Blocks<T>
+  where T is a type-variable:
+    T extends Object declared in class Board.Blocks
+Board.java:167: warning: [rawtypes] found raw type: Board.Blocks
+  private static Board newBoard(Blocks blocks, int dimension, int rowOfBlank, int colOfBlank, int hamming, int manhattan, boolean isGoal, long hashCode){
+                                ^
+  missing type arguments for generic class Board.Blocks<T>
+  where T is a type-variable:
+    T extends Object declared in class Board.Blocks
+Board.java:244: warning: [rawtypes] found raw type: Board.Blocks
+  private Board(Blocks blocks, int dimension, int rowOfBlank, int colOfBlank, int hamming, int manhattan, boolean isGoal, long hashCode){
+                ^
+  missing type arguments for generic class Board.Blocks<T>
+  where T is a type-variable:
+    T extends Object declared in class Board.Blocks
+Board.java:624: warning: [rawtypes] found raw type: Board.Blocks
+  private static String blocksString(Blocks blocks){
+                                     ^
+  missing type arguments for generic class Board.Blocks<T>
+  where T is a type-variable:
+    T extends Object declared in class Board.Blocks
+4 warnings
 
 % javac Solver.java
 *-----------------------------------------------------------
@@ -80,20 +73,24 @@ Solver:
 
 
 ********************************************************************************
-*  CHECKING STYLE AND COMMON BUG PATTERNS
+*  CHECKING STYLE AND COMMON BUG PATTERNS                                       
 ********************************************************************************
 
 
 % findbugs *.class
 *-----------------------------------------------------------
-L M LI_LAZY_INIT_STATIC LI: Incorrect lazy initialization of static field Board.blocksCache in Board.newBoard(Board$Blocks, int, int, int, int, int, boolean, long)  At Board.java:[lines 62-63]
-L P UPM_UNCALLED_PRIVATE_METHOD UPM: The private method 'println()' is never called.  At Board.java:[lines 217-218]
-M B NP_EQUALS_SHOULD_HANDLE_NULL_ARGUMENT NP: The 'equals()' method does not return 'false' if the argument is null.  At Solver.java:[lines 179-181]
-M B BC_EQUALS_METHOD_SHOULD_WORK_FOR_ALL_OBJECTS BC: The 'equals()' method for 'Solver$BoardNode' assumes the argument is of type 'Solver$BoardNode'; it should be of type 'java.lang.Object'.  At Solver.java:[line 180]
-M B HE_EQUALS_USE_HASHCODE HE: The class overrides 'equals()' but not 'hashCode()'. As a result, 'Solver$BoardNode' will not work with 'java.util.HashMap' or 'java.util.HashSet'.  At Solver.java:[lines 179-181]
-L D UCF_USELESS_CONTROL_FLOW UCF: Contains a useless control-flow statement, which leads to same result regardless of whether branch is taken.  At Solver.java:[line 147]
-L P UPM_UNCALLED_PRIVATE_METHOD UPM: The private method 'println()' is never called.  At Solver.java:[lines 131-132]
-Warnings generated: 7
+L M LI_LAZY_INIT_STATIC LI: Incorrect lazy initialization of static field Board.boardCache in Board.newBoard(Board$Blocks, int, int, int, int, int, boolean, long)  At Board.java:[lines 168-169]
+L P UPM_UNCALLED_PRIVATE_METHOD UPM: The private method 'println()' is never called.  At Board.java:[lines 287-288]
+L P UPM_UNCALLED_PRIVATE_METHOD UPM: The private method 'testBlocks()' is never called.  At Board.java:[lines 25-43]
+L P UPM_UNCALLED_PRIVATE_METHOD UPM: The private method 'testMahattan2()' is never called.  At Board.java:[lines 411-440]
+M D DLS_DEAD_LOCAL_STORE DLS: Assigns a value to the local variable 'prevManhattan' but that value is never used.  At Board.java:[line 546]
+M D DLS_DEAD_LOCAL_STORE DLS: Assigns a value to the local variable 'nextManhattan' but that value is never used.  At Board.java:[line 549]
+M B NP_EQUALS_SHOULD_HANDLE_NULL_ARGUMENT NP: The 'equals()' method does not return 'false' if the argument is null.  At Solver.java:[lines 229-231]
+M B BC_EQUALS_METHOD_SHOULD_WORK_FOR_ALL_OBJECTS BC: The 'equals()' method for 'Solver$BoardNode' assumes the argument is of type 'Solver$BoardNode'; it should be of type 'java.lang.Object'.  At Solver.java:[line 230]
+M B HE_EQUALS_USE_HASHCODE HE: The class overrides 'equals()' but not 'hashCode()'. As a result, 'Solver$BoardNode' will not work with 'java.util.HashMap' or 'java.util.HashSet'.  At Solver.java:[lines 229-231]
+L D UCF_USELESS_CONTROL_FLOW UCF: Contains a useless control-flow statement, which leads to same result regardless of whether branch is taken.  At Solver.java:[line 200]
+L P UPM_UNCALLED_PRIVATE_METHOD UPM: The private method 'println()' is never called.  At Solver.java:[lines 184-185]
+Warnings generated: 11
 
 ================================================================
 
@@ -102,45 +99,45 @@ Warnings generated: 7
 *-----------------------------------------------------------
 Board.java:1: Do not use .* in import statements. [AvoidStarImport]
 Board.java:2: Do not use .* in import statements. [AvoidStarImport]
-Board.java:5:23: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:7:5: Declare static and instance variables in order of their access modifiers: public, protected, package, and private. [DeclarationOrder]
-Board.java:7:15: The instance (or static) variable 'dimension' must be private. [VisibilityModifier]
-Board.java:9:27: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:14:41: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:19:30: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:23:38: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:24:41: Typecast is not followed by whitespace. [WhitespaceAfter]
-Board.java:27:25: The local (or parameter) variable 'blocks' has the same name as an instance variable. Use a different name. [HiddenField]
-Board.java:27:32: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:29:48: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:30:50: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:31:41: Typecast is not followed by whitespace. [WhitespaceAfter]
-Board.java:38:24: The local (or parameter) variable 'blocks' has the same name as an instance variable. Use a different name. [HiddenField]
-Board.java:38:31: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:40:46: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:47:18: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:52:19: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:59:3: Declare static variables before instance variables, constructors, and methods. [DeclarationOrder]
-Board.java:61: Line is longer than 128 characters (currently 153). [LineLength]
-Board.java:61:24: More than 7 parameters (found 8). [ParameterNumber]
-Board.java:61:153: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:62:29: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:65:43: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:74:34: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:81:26: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:83:53: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:84:55: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:91:11: 'assert' is not followed by whitespace. [WhitespaceAround]
-Board.java:134:28: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:136:9: The local (or parameter) variable 'dimension' has the same name as an instance variable. Use a different name. [HiddenField]
-Board.java:137:46: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:138:48: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:140:20: '{' is not preceded with whitespace. [WhitespaceAround]
-Board.java:162:3: Define constructors after static and instance variables but before methods. [DeclarationOrder]
-Board.java:174: Line is longer than 128 characters (currently 137). [LineLength]
-Board.java:174:3: Define constructors after static and instance variables but before methods. [DeclarationOrder]
+Board.java:5:11: Do not use the keyword 'abstract' in this course. [IllegalToken]
+Board.java:5:35: '>' is followed by an illegal character. [GenericWhitespace]
+Board.java:5:35: '{' is not preceded with whitespace. [WhitespaceAround]
+Board.java:6:5: Do not use the keyword 'abstract' in this course. [IllegalToken]
+Board.java:7:5: Do not use the keyword 'abstract' in this course. [IllegalToken]
+Board.java:8:5: Do not use the keyword 'abstract' in this course. [IllegalToken]
+Board.java:9:5: Do not use the keyword 'abstract' in this course. [IllegalToken]
+Board.java:9:24: The local (or parameter) variable 'blocks' has the same name as an instance variable. Use a different name. [HiddenField]
+Board.java:10:5: Do not use the keyword 'abstract' in this course. [IllegalToken]
+Board.java:10:32: The local (or parameter) variable 'blocks' has the same name as an instance variable. Use a different name. [HiddenField]
+Board.java:11:5: Do not use the keyword 'abstract' in this course. [IllegalToken]
+Board.java:13:24: '{' is not preceded with whitespace. [WhitespaceAround]
+Board.java:15:48: '{' is not preceded with whitespace. [WhitespaceAround]
+Board.java:16:50: '{' is not preceded with whitespace. [WhitespaceAround]
+Board.java:24:28: '{' is not preceded with whitespace. [WhitespaceAround]
+Board.java:31:11: 'assert' is not followed by whitespace. [WhitespaceAround]
+Board.java:31:26: ',' is not followed by whitespace. [WhitespaceAfter]
+Board.java:32:14: ',' is not followed by whitespace. [WhitespaceAfter]
+Board.java:32:16: ',' is not followed by whitespace. [WhitespaceAfter]
+Board.java:33:11: 'assert' is not followed by whitespace. [WhitespaceAround]
+Board.java:33:26: ',' is not followed by whitespace. [WhitespaceAfter]
+Board.java:34:14: ',' is not followed by whitespace. [WhitespaceAfter]
+Board.java:34:16: ',' is not followed by whitespace. [WhitespaceAfter]
+Board.java:35:11: 'assert' is not followed by whitespace. [WhitespaceAround]
+Board.java:35:26: ',' is not followed by whitespace. [WhitespaceAfter]
+Board.java:36:11: 'assert' is not followed by whitespace. [WhitespaceAround]
+Board.java:36:26: ',' is not followed by whitespace. [WhitespaceAfter]
+Board.java:37:14: ',' is not followed by whitespace. [WhitespaceAfter]
+Board.java:37:16: ',' is not followed by whitespace. [WhitespaceAfter]
+Board.java:38:11: 'assert' is not followed by whitespace. [WhitespaceAround]
+Board.java:38:26: ',' is not followed by whitespace. [WhitespaceAfter]
+Board.java:39:14: ',' is not followed by whitespace. [WhitespaceAfter]
+Board.java:39:16: ',' is not followed by whitespace. [WhitespaceAfter]
+Board.java:40:11: 'assert' is not followed by whitespace. [WhitespaceAround]
+Board.java:40:27: ',' is not followed by whitespace. [WhitespaceAfter]
+Board.java:41:14: ',' is not followed by whitespace. [WhitespaceAfter]
+Board.java:41:16: ',' is not followed by whitespace. [WhitespaceAfter]
 ...
- Checkstyle ends with 158 errors.
+ Checkstyle ends with 298 errors.
 
 ================================================================
 
@@ -154,6 +151,70 @@ Testing correctness of Board
 Running 22 total tests.
 
 Tests 5, 6, 13, and 14 rely upon toString() returning results in prescribed format.
+
+Test 1a: Test hamming() with file inputs
+  * puzzle04.txt
+  * puzzle00.txt
+  * puzzle07.txt
+  * puzzle17.txt
+  * puzzle27.txt
+  * puzzle2x2-unsolvable1.txt
+==> passed
+
+Test 1b: Test hamming() with random n-by-n boards
+  * 2-by-2
+  * 3-by-3
+  * 4-by-4
+  * 5-by-5
+  * 9-by-9
+  * 10-by-10
+  * 127-by-127
+==> passed
+
+Test 2a: Test manhattan() with file inputs
+  * puzzle04.txt
+  * puzzle00.txt
+  * puzzle07.txt
+  * puzzle17.txt
+  * puzzle27.txt
+  * puzzle2x2-unsolvable1.txt
+==> passed
+
+Test 2b: Test manhattan() with random n-by-n boards
+  * 2-by-2
+  * 3-by-3
+  * 4-by-4
+  * 5-by-5
+  * 9-by-9
+  * 10-by-10
+  * 127-by-127
+==> passed
+
+Test 3: Test dimension() with random n-by-n boards
+  * 2-by-2
+  * 3-by-3
+  * 4-by-4
+  * 5-by-5
+==> passed
+
+Test 4a: Test toString() with file inputs
+  * puzzle04.txt
+  * puzzle00.txt
+  * puzzle06.txt
+  * puzzle09.txt
+  * puzzle23.txt
+  * puzzle2x2-unsolvable1.txt
+==> passed
+
+Test 4b: Test toString() with random n-by-n boards
+  * 2-by-2
+  * 3-by-3
+  * 4-by-4
+  * 5-by-5
+  * 9-by-9
+  * 10-by-10
+  * 127-by-127
+==> passed
 
 Test 5a: Test neighbors() with file inputs
   * puzzle04.txt
@@ -170,28 +231,36 @@ Test 5a: Test neighbors() with file inputs
 Test 5b: Test neighbors() with random n-by-n boards
   * 2-by-2
   * 3-by-3
+    - neighbor not found by student:
+        3
+         1  5  8 
+         6  2  7 
+         4  0  3 
+
+    - failed on trial 772 of 1000
+
   * 4-by-4
   * 5-by-5
   * 9-by-9
     - neighbor not found by student:
         9
-        65 50 70 10 76 61  7 25 40
-        15 12 52 78 53 11 38 66 74
-        19 72 42 48  3  9 35  5 46
-         1 17  4 68 67 63 71 54 23
-        39 28 44 36 45 55  2 34 16
-        56 62 14 75 21 69 18  6 43
-        41 79 26 32 37 20 64 31 49
-        22 73 13 59 27 57 30 33 29
-        60 47  0 58 51 24 77 80  8
+        61 64 58 71 52 20 80 26 18 
+        72 15 67 42 23 60 30 28 59 
+        41 57 43 44 75 33 45 34 32 
+        63 22 13 17  6 79 19 66 16 
+        38 68  3 21 78 35 47  4 46 
+        40  1 36 39 49  7 12 69 14 
+        70 50 53 74 54 73 51 29 76 
+        27 37 62 25 65 10 77 11 55 
+         8  9  5 24 56 48  2  0 31 
 
-    - failed on trial 9 of 1000
+    - failed on trial 4 of 1000
 
   * 10-by-10
     - neighbor not found by student:
         [suppressed]
 
-    - failed on trial 4 of 1000
+    - failed on trial 3 of 1000
 
   * 127-by-127
     - neighbor not found by student:
@@ -207,28 +276,28 @@ Test 6a: Test neighbors() of neigbors() with file inputs
     - student   solution has 6 non-null entries
     - reference solution has 6 non-null entries
     - 6 extra entries in student solution, including: 10
- 1  2  3  4  5  6  7  8  9 10
-11 12 13 14 15 16 17 18 19 20
-21 22 23 24 25 26 27 28 29 30
-31 32 33 34 35 36 37 38 39 40
-41 42 43 44 45 46 47 48 49 50
-51 52 53 54 55 56 57 58 59 60
-61 62 63 64 65 66 67 68 69 70
-71 72 73 74 75 76 77 78 79 80
-81 82 83 84 85 86 87 88 89  0
-91 92 93 94 95 96 97 98 99 90
+ 1  2  3  4  5  6  7  8  9 10 
+11 12 13 14 15 16 17 18 19 20 
+21 22 23 24 25 26 27 28 29 30 
+31 32 33 34 35 36 37 38 39 40 
+41 42 43 44 45 46 47 48 49 50 
+51 52 53 54 55 56 57 58 59 60 
+61 62 63 64 65 66 67 68 69 70 
+71 72 73 74 75 76 77 78 79 80 
+81 82 83 84 85 86 87 88 89  0 
+91 92 93 94 95 96 97 98 99 90 
 
     - 6 missing entries in student solution, including: 10
- 1  2  3  4  5  6  7  8  9 10
-11 12 13 14 15 16 17 18 19 20
-21 22 23 24 25 26 27 28 29 30
-31 32 33 34 35 36 37 38 39 40
-41 42 43 44 45 46 47 48 49 50
-51 52 53 54 55 56 57 58 59 60
-61 62 63 64 65 66 67 68 69 70
-71 72 73 74 75 76 77 78 79 80
-81 82 83 84 85 86 87 88 89 90
-91 92 93 94 95 96 97 98 99  0
+ 1  2  3  4  5  6  7  8  9 10 
+11 12 13 14 15 16 17 18 19 20 
+21 22 23 24 25 26 27 28 29 30 
+31 32 33 34 35 36 37 38 39 40 
+41 42 43 44 45 46 47 48 49 50 
+51 52 53 54 55 56 57 58 59 60 
+61 62 63 64 65 66 67 68 69 70 
+71 72 73 74 75 76 77 78 79 80 
+81 82 83 84 85 86 87 88 89 90 
+91 92 93 94 95 96 97 98 99  0 
 
 
   * puzzle06.txt
@@ -240,40 +309,40 @@ Test 6a: Test neighbors() of neigbors() with file inputs
 Test 6b: Test neighbors() of neighbors() with random n-by-n boards
   * 2-by-2
   * 3-by-3
-    - student   solution has 8 non-null entries
-    - reference solution has 8 non-null entries
-    - 1 extra entry in student solution: 3
- 7  3  6
- 1  0  8
- 5  4  2
+    - student   solution has 6 non-null entries
+    - reference solution has 6 non-null entries
+    - 2 extra entries in student solution, including: 3
+ 7  1  5 
+ 0  6  4 
+ 3  8  2 
 
-    - 1 missing entry in student solution: 3
- 3  8  1
- 7  5  0
- 6  4  2
+    - 2 missing entries in student solution, including: 3
+ 1  7  0 
+ 6  5  4 
+ 3  8  2 
 
 
-    - failed on trial 30 of 1000
+    - failed on trial 90 of 1000
 
   * 4-by-4
   * 5-by-5
   * 9-by-9
     - incorrect number of neighbors of neighbors
-    - student   neighbors = 13
-    - reference neighbors = 14
+    - student   neighbors = 12
+    - reference neighbors = 10
     - board
         9
-        22 55 58 39 40 70 63 57 42
-        28 74 31 11 34  6 65 62  2
-        79 76 47 35 19 45 44 12 72
-        80 41 24 18 37 33 64 71  8
-        52  7 10 50 77 61  3 27 14
-        56  5 26 49 30 36 17 51 66
-        15 60 54 21 46 53 67 68 59
-        29  0 32 13 43 20  9 25 69
-        38 16  1 75 48  4 78 23 73
+        12 67 55 69 34 29  7 75  5 
+        11 64 72 52 38  9 54 16 40 
+        74 35 37 17 70  1 71  4 26 
+        19 15 20 57 10 22 32 56 25 
+        23 47 46 79 49 21 80 65 39 
+        13 18 51  6 33 61 41 76 43 
+        27 58 66 77 30 68  3 45 50 
+        36  2 14 60  8 48 73 28 59 
+        44 62 42 63 53 31  0 78 24 
 
-    - failed on trial 1 of 1000
+    - failed on trial 2 of 1000
 
   * 10-by-10
     - incorrect number of neighbors of neighbors
@@ -281,16 +350,16 @@ Test 6b: Test neighbors() of neighbors() with random n-by-n boards
     - reference neighbors = 10
     - board
         10
-        92 76 14 12  4 68 36 16 39 35
-        65 98 41 57 51 54 56 15 40 24
-        52 87 86 29 42 53 55 19  5 50
-        18 26  9 20 44 48 79 85  2 31
-        70 38 64 74 94 49 47 59  1 21
-        83 99 22 96 62 25 81  8 72 61
-        27 34 69 63 10 88 67 60 33 11
-        73 97 37 80 91 95 77 17 93 75
-        13  7 32  3 46 82 71 90 89 66
-         6 30 43  0 28 58 84 23 45 78
+        19 24 98 46 44 89 32 91 21 80 
+        62 96 25 35 26 70 49 53 90 34 
+        42 41 37 86  6 77 73 94 10  8 
+        84  9 63 78 99 82 56 61 13 58 
+        39 18 43 27  4 30 79 38 97  5 
+        36 15 22 67 45 83 74 59 57 14 
+         3 33 40 23 11 55 72 17 51 88 
+         7 50 16 66 95  2 65 69 87 52 
+        81 47 64 85 75 29 93 71 48 28 
+         1 76  0 68 31 54 92 12 60 20 
 
     - failed on trial 1 of 1000
 
@@ -303,36 +372,16 @@ Test 7a: Test twin() with file inputs
   * puzzle09.txt
   * puzzle23.txt
   * puzzle2x2-unsolvable1.txt
-    - twin() doesn't return a twin
-        2
-         3  2
-         0  1
-
-==> FAILED
+==> passed
 
 Test 7b: Test twin() with random n-by-n boards
   * 2-by-2
-    - twin() doesn't return a twin
-        2
-         2  3
-         0  1
-
-    - failed on trial 2 of 1000
-
   * 3-by-3
-    - twin() doesn't return a twin
-        3
-         5  0  8
-         2  3  7
-         4  1  6
-
-    - failed on trial 1 of 1000
-
   * 4-by-4
   * 5-by-5
   * 9-by-9
   * 10-by-10
-==> FAILED
+==> passed
 
 Test 8a: Test isGoal() on file inputs
   * puzzle00.txt
@@ -412,10 +461,16 @@ Test 14: Call manhattan() on a board that is a kth-neighbor of a board
   * 13th neighbor of puzzle27.txt
   * 13th neighbor of puzzle00.txt
   * 13th neighbor of puzzle2x2-unsolvable1.txt
-==> passed
+    - student   manhattan() = 4
+    - reference manhattan() = 2
+        2
+         3  2 
+         1  0 
+
+==> FAILED
 
 
-Total: 16/22 tests passed!
+Total: 17/22 tests passed!
 
 
 ================================================================
@@ -480,94 +535,19 @@ Test 4b: Call isSolvable() on random n-by-n boards
 
 Test 5: Call moves() on unsolvable puzzles
   * puzzle2x2-unsolvable1.txt
-    java.lang.NullPointerException
-
-    Solver.moves(Solver.java:229)
-    TestSolver.testMoves(TestSolver.java:152)
-    TestSolver.testMoves(TestSolver.java:111)
-    TestSolver.test5(TestSolver.java:440)
-    TestSolver.main(TestSolver.java:985)
-
   * puzzle2x2-unsolvable2.txt
-    java.lang.NullPointerException
-
-    Solver.moves(Solver.java:229)
-    TestSolver.testMoves(TestSolver.java:152)
-    TestSolver.testMoves(TestSolver.java:111)
-    TestSolver.test5(TestSolver.java:441)
-    TestSolver.main(TestSolver.java:985)
-
   * puzzle3x3-unsolvable1.txt
-    java.lang.NullPointerException
-
-    Solver.moves(Solver.java:229)
-    TestSolver.testMoves(TestSolver.java:152)
-    TestSolver.testMoves(TestSolver.java:111)
-    TestSolver.test5(TestSolver.java:442)
-    TestSolver.main(TestSolver.java:985)
-
   * puzzle3x3-unsolvable2.txt
-    java.lang.NullPointerException
-
-    Solver.moves(Solver.java:229)
-    TestSolver.testMoves(TestSolver.java:152)
-    TestSolver.testMoves(TestSolver.java:111)
-    TestSolver.test5(TestSolver.java:443)
-    TestSolver.main(TestSolver.java:985)
-
   * puzzle4x4-unsolvable.txt
-    java.lang.NullPointerException
-
-    Solver.moves(Solver.java:229)
-    TestSolver.testMoves(TestSolver.java:152)
-    TestSolver.testMoves(TestSolver.java:111)
-    TestSolver.test5(TestSolver.java:444)
-    TestSolver.main(TestSolver.java:985)
-
-==> FAILED
+==> passed
 
 Test 6: Call solution() on unsolvable puzzles
   * puzzle2x2-unsolvable1.txt
-    java.lang.NullPointerException
-
-    Solver.solution(Solver.java:235)
-    TestSolver.testUnsolvableSolution(TestSolver.java:286)
-    TestSolver.test6(TestSolver.java:453)
-    TestSolver.main(TestSolver.java:988)
-
   * puzzle2x2-unsolvable2.txt
-    java.lang.NullPointerException
-
-    Solver.solution(Solver.java:235)
-    TestSolver.testUnsolvableSolution(TestSolver.java:286)
-    TestSolver.test6(TestSolver.java:454)
-    TestSolver.main(TestSolver.java:988)
-
   * puzzle3x3-unsolvable1.txt
-    java.lang.NullPointerException
-
-    Solver.solution(Solver.java:235)
-    TestSolver.testUnsolvableSolution(TestSolver.java:286)
-    TestSolver.test6(TestSolver.java:455)
-    TestSolver.main(TestSolver.java:988)
-
   * puzzle3x3-unsolvable2.txt
-    java.lang.NullPointerException
-
-    Solver.solution(Solver.java:235)
-    TestSolver.testUnsolvableSolution(TestSolver.java:286)
-    TestSolver.test6(TestSolver.java:456)
-    TestSolver.main(TestSolver.java:988)
-
   * puzzle4x4-unsolvable.txt
-    java.lang.NullPointerException
-
-    Solver.solution(Solver.java:235)
-    TestSolver.testUnsolvableSolution(TestSolver.java:286)
-    TestSolver.test6(TestSolver.java:457)
-    TestSolver.main(TestSolver.java:988)
-
-==> FAILED
+==> passed
 
 Test 7a: Check that Solver is immutable by testing whether methods
          return the same value, regardless of order in which called
@@ -581,61 +561,10 @@ Test 7a: Check that Solver is immutable by testing whether methods
 Test 7b: Check that Solver is immutable by testing whether methods
          return the same value, regardless of order in which called
   * puzzle3x3-unsolvable1.txt
-    java.lang.NullPointerException
-
-    Solver.solution(Solver.java:235)
-    TestSolver.testImmutableSolver(TestSolver.java:512)
-    TestSolver.testImmutableSolver(TestSolver.java:601)
-    TestSolver.test7b(TestSolver.java:621)
-    TestSolver.main(TestSolver.java:994)
-
-    - sequence of Solver operations was:
-          Solver solver = new Solver(initial);
-          solver.solution()
   * puzzle3x3-unsolvable2.txt
-    java.lang.NullPointerException
-
-    Solver.solution(Solver.java:235)
-    TestSolver.testImmutableSolver(TestSolver.java:512)
-    TestSolver.testImmutableSolver(TestSolver.java:601)
-    TestSolver.test7b(TestSolver.java:622)
-    TestSolver.main(TestSolver.java:994)
-
-    - sequence of Solver operations was:
-          Solver solver = new Solver(initial);
-          solver.solution()
   * puzzle4x4-unsolvable.txt
-    java.lang.NullPointerException
-
-    Solver.solution(Solver.java:235)
-    TestSolver.testImmutableSolver(TestSolver.java:512)
-    TestSolver.testImmutableSolver(TestSolver.java:601)
-    TestSolver.test7b(TestSolver.java:623)
-    TestSolver.main(TestSolver.java:994)
-
-    - sequence of Solver operations was:
-          Solver solver = new Solver(initial);
-          solver.isSolvable() -> false
-          solver.isSolvable() -> false
-          solver.isSolvable() -> false
-          solver.isSolvable() -> false
-          solver.solution()
   * random 2-by-2 unsolvable boards
-    java.lang.NullPointerException
-
-    Solver.moves(Solver.java:229)
-    TestSolver.testImmutableSolver(TestSolver.java:492)
-    TestSolver.testImmutableSolverUnsolvableBoards(TestSolver.java:585)
-    TestSolver.test7b(TestSolver.java:624)
-    TestSolver.main(TestSolver.java:994)
-
-    - sequence of Solver operations was:
-          Solver solver = new Solver(initial);
-          solver.isSolvable() -> false
-          solver.moves()
-    - failed on trial 1 of 10
-
-==> FAILED
+==> passed
 
 Test 8: Call moves() with more file inputs
   * puzzle14.txt
@@ -653,13 +582,10 @@ Test 8: Call moves() with more file inputs
   * puzzle26.txt
   * puzzle27.txt
   * puzzle28.txt
-
-        ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        OperationCountLimitExceededException
-        Number of calls to methods in Board exceeds limit: 100000000
-        ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-==> FAILED
+  * puzzle29.txt
+  * puzzle30.txt
+  * puzzle31.txt
+==> passed
 
 Test 9: Check whether equals() method in Board is called
         with an argument of the wrong type
@@ -729,13 +655,9 @@ Test 13a: Call moves() with 3-by-3 file inputs
   * puzzle3x3-26.txt
   * puzzle3x3-27.txt
   * puzzle3x3-28.txt
-
-        ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        OperationCountLimitExceededException
-        Number of calls to methods in Board exceeds limit: 100000000
-        ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-==> FAILED
+  * puzzle3x3-29.txt
+  * puzzle3x3-30.txt
+==> passed
 
 Test 13b: Call solution() with 3-by-3 file inputs
   * puzzle3x3-00.txt
@@ -767,13 +689,9 @@ Test 13b: Call solution() with 3-by-3 file inputs
   * puzzle3x3-26.txt
   * puzzle3x3-27.txt
   * puzzle3x3-28.txt
-
-        ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        OperationCountLimitExceededException
-        Number of calls to methods in Board exceeds limit: 100000000
-        ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-==> FAILED
+  * puzzle3x3-29.txt
+  * puzzle3x3-30.txt
+==> passed
 
 Test 14a: Call moves() with 4-by-4 file inputs
   * puzzle4x4-00.txt
@@ -851,7 +769,7 @@ Test 15: Call moves() with random solvable n-by-n boards
 ==> passed
 
 
-Total: 14/20 tests passed!
+Total: 20/20 tests passed!
 
 
 ================================================================
@@ -867,19 +785,19 @@ Memory usage of an n-by-n board
 
               n       student (bytes)    reference (bytes)
 ----------------------------------------------------------
-=> passed     4           152                  240
-=> passed     8           248                  560
-=> passed    12           408                 1008
-=> passed    16           632                 1584
-=> passed    20           920                 2288
-=> passed    36          2712                 6384
-=> passed    72         10488                23088
-=> passed   120         28920                61488
+=> passed     4           104                  240
+=> passed     8           256                  560
+=> passed    12           416                 1008
+=> passed    16           640                 1584
+=> passed    20           928                 2288
+=> passed    36          2720                 6384
+=> passed    72         10496                23088
+=> passed   120         28928                61488
 ==> 8/8 tests passed
 
 Total: 8/8 tests passed!
 
-Student   memory = 2.00 n^2 + 0.00 n + 120.00   (R^2 = 1.000)
+Student   memory = 0.00 n^3 + 1.63 n^2 + 10.01 n + 49.74   (R^2 = 1.000)
 Reference memory = 4.00 n^2 + 32.00 n + 48.00   (R^2 = 1.000)
 
 ================================================================
@@ -891,21 +809,21 @@ Computing memory of Solver
 Running 3 total tests.
 
 Test 1: memory with puzzle20.txt (must be <= 2.0x reference solution)
-  - memory of student   Solver = 4576 bytes
+  - memory of student   Solver = 3736 bytes
   - memory of reference Solver = 4896 bytes
-  - student / reference        = 0.93
+  - student / reference        = 0.76
 ==> passed
 
 Test 2: memory with puzzle25.txt (must be <= 2.0x reference solution)
-  - memory of student   Solver = 5720 bytes
+  - memory of student   Solver = 4640 bytes
   - memory of reference Solver = 6056 bytes
-  - student / reference        = 0.94
+  - student / reference        = 0.77
 ==> passed
 
 Test 3: memory with puzzle30.txt (must be <= 2.0x reference solution)
-  - memory of student   Solver = 6320 bytes
+  - memory of student   Solver = 4904 bytes
   - memory of reference Solver = 7216 bytes
-  - student / reference        = 0.88
+  - student / reference        = 0.68
 ==> passed
 
 
@@ -916,7 +834,7 @@ Total: 3/3 tests passed!
 
 
 ********************************************************************************
-*  TIMING
+*  TIMING                                                                  
 ********************************************************************************
 
 Timing Solver
@@ -928,19 +846,30 @@ Maximum time allowed per puzzle is 10 seconds.
 
                filename   N    seconds    insert()            delMin()         max PQ size
 ---------------------------------------------------------------------------------------------
-=> passed  puzzle20.txt   3     0.02        409                 253                 157
-=> passed  puzzle21.txt   3     0.01       1642                1028                 615
-=> passed  puzzle22.txt   3     0.01       1141                 711                 431
-=> passed  puzzle23.txt   3     0.03       2894                1813                1082
-=> passed  puzzle24.txt   3     0.01       1608                1005                 604
-=> passed  puzzle25.txt   3     0.05       3555                2236                1320
-=> passed  puzzle26.txt   3     0.01       1120                 715                 406
-=> passed  puzzle27.txt   3     0.03       2448                1542
+=> passed  puzzle20.txt   3     0.03        531                 318                 214         
+=> passed  puzzle21.txt   3     0.01       1162                 692                 471         
+=> passed  puzzle22.txt   3     0.00       1035                 620                 416         
+=> passed  puzzle23.txt   3     0.01       2533                1491                1043         
+=> passed  puzzle24.txt   3     0.00       1133                 690                 445         
+=> passed  puzzle25.txt   3     0.02       4372                2616                1757         
+=> passed  puzzle26.txt   3     0.01       2525                1494                1032         
+=> passed  puzzle27.txt   3     0.01       5662                3429                2234         
+=> passed  puzzle28.txt   3     0.01       4872                2962                1911         
+=> passed  puzzle29.txt   3     0.01       5231                3116                2116         
+=> passed  puzzle30.txt   3     0.00       2714                1623                1092         
+=> passed  puzzle31.txt   3     0.03      15617                9392                6226         
+=> passed  puzzle34.txt   4     0.30     111423               52931               58493         
+=> passed  puzzle37.txt   4     0.12      47657               22371               25287         
+=> passed  puzzle39.txt   4     0.09      37609               18192               19418         
+=> passed  puzzle41.txt   5     0.09      15111                6449                8663         
+=> passed  puzzle44.txt   5     0.13      37098               16682               20417         
+==> 17/17 tests passed
 
-...
+Total: 17/17 tests passed!
 
-WARNING: the grading output was truncated due to excessive length.
-Typically, this is because you have a method that has an unanticipated side effect
-(such as printing to standard output or throwing an exception). A large amount of output
-can also arise from failing many tests.
+
+================================================================
+
+
+
 

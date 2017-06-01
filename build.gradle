@@ -24,6 +24,8 @@ dependencies {
     testCompile 'org.hamcrest:java-hamcrest:2.0.0.0'
 }
 
+compileJava.options.compilerArgs = ['-Xlint:all']
+
 test {
   testLogging {
     lifecycle {
