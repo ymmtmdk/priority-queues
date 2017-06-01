@@ -375,14 +375,8 @@ public class Board {
         }
       }
       if (distCol < 0){
-        /*
-           3 1 8    1 2 3
-           7   2    4 5 6
-           4 5 6    7 8
-           */
         for (int c = col-1; c >= correntColOfN; c--){
-          if (isInCorrectRow(row, c) && correctDistCol(row, c) >= 0) // correctDistCol = -1
-          {
+          if (isInCorrectRow(row, c) && correctDistCol(row, c) >= 0){
             lineConflict += 1;
           }
         }
