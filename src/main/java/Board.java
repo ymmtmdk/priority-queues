@@ -559,13 +559,14 @@ public class Board {
   private Board exBoard(int row0, int col0, int row1, int col1, int row2, int col2){
     int n = blocks.get(row2, col2);
 
-    int prevManhattan = manhattan(n, blocks.dimension(), row2, col2);
+    // int prevManhattan = manhattan(n, blocks.dimension(), row2, col2);
     int prevHamming = hamming(n, blocks.dimension(), row2, col2);
     exchange(row1, col1, row2, col2);
-    int nextManhattan = manhattan(n, blocks.dimension(), row1, col1);
+    // int nextManhattan = manhattan(n, blocks.dimension(), row1, col1);
     int nextHamming = hamming(n,  blocks.dimension(), row1, col1);
     // int newManhattan = manhattan - prevManhattan + nextManhattan;
     int newManhattan = calcManhattan2();
+    // int newManhattan = calcManhattan();
     int newHamming = hamming - prevHamming + nextHamming;
     // long newHash = calcHash(row2, col2, row1, col1);
     long newHash = calcHash0();
@@ -628,7 +629,8 @@ public class Board {
 
   public Iterable<Board> neighbors()
   {
-    PriorityQueue<Board> q = new PriorityQueue<Board>(new PriorityComparator());
+    Deque<Board> q = new ArrayDeque<Board>();
+    // PriorityQueue<Board> q = new PriorityQueue<Board>(new PriorityComparator());
     if (rowOfBlank > 0){
       q.add(neighbor(Dir.UP));
     }

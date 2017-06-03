@@ -2,41 +2,109 @@ import edu.princeton.cs.algs4.*;
 import java.util.*;
 
 public class Solver {
+  private class PriorityComparator implements Comparator<BoardNode>{
+    public int compare(BoardNode a, BoardNode b){
+      return Integer.compare(a.priority,  b.priority);
+    }
+  }
+
+  private class ReversePriorityComparator implements Comparator<BoardNode>{
+    public int compare(BoardNode a, BoardNode b){
+      return Integer.compare(b.priority,  a.priority);
+    }
+  }
+
+  private class ZeroPriorityComparator implements Comparator<BoardNode>{
+    public int compare(BoardNode a, BoardNode b){
+      return 0;
+    }
+  }
+
   abstract private class AStar{
-    private class PriorityComparator implements Comparator<BoardNode>{
-      public int compare(BoardNode a, BoardNode b){
-        return Integer.compare(a.priority,  b.priority);
+    /*
+        node              current node
+ g                 the cost to reach current node
+ f                 estimated cost of the cheapest path (root..node..goal)
+ h(node)           estimated cost of the cheapest path (node..goal)
+ cost(node, succ)  step cost function
+ is_goal(node)     goal test
+ successors(node)  node expanding function, expand nodes ordered by g + h(node)
+
+ procedure ida_star(root)
+   bound := h(root)
+   loop
+     t := search(root, 0, bound)
+     if t = FOUND then return bound
+     if t = ∞ then return NOT_FOUND
+     bound := t
+   end loop
+ end procedure
+
+ function search(node, g, bound)
+   f := g + h(node)
+   if f > bound then return f
+   if is_goal(node) then return FOUND
+   min := ∞
+   for succ in successors(node) do
+     t := search(succ, g + cost(node, succ), bound)
+     if t = FOUND then return FOUND
+     if t < min then min := t
+   end for
+   return min
+ end function
+
+       */
+    class NodeScore{
+      final BoardNode node;
+      final int score;
+      NodeScore(BoardNode node, int score){
+        this.node = node;
+        this.score = score;
       }
     }
 
-    private class ReversePriorityComparator implements Comparator<BoardNode>{
-      public int compare(BoardNode a, BoardNode b){
-        return Integer.compare(b.priority,  a.priority);
+    Deque<BoardNode> ida_star(BoardNode root, BoardNode goal, BoardNode goal2){
+      NodeScore bound = new NodeScore(root, root.priority);
+      while(true){
+        NodeScore t = search(root, 0, bound, goal);
+        if (t == null) return null;
+        if (t.score == 0) return path(t.node);
+        bound = t;
       }
     }
 
-    private class ZeroPriorityComparator implements Comparator<BoardNode>{
-      public int compare(BoardNode a, BoardNode b){
-        return 0;
+    NodeScore search(BoardNode node, int g, NodeScore bound, BoardNode goal){
+      int f = g + node.priority;
+      if (f > bound.score) return new NodeScore(node, f);
+      if (node.equals(goal)) return new NodeScore(node, 0);
+      NodeScore min = new NodeScore(null, 100000);
+      for (BoardNode succ : node.neighbors()){
+        if (node.isCritical(succ)){
+          continue;
+        }
+        NodeScore t = search(succ, g + succ.priority - node.priority, bound, goal);
+        if (t.score == 0) return t;
+        if (t.score < min.score) min = t;
       }
+      return min;
     }
 
     /*
-    function IDDFS(node)
-    for (depth = 0; ; depth++)
-        found = DLS(node, depth)
-        if (found != NULL) then
-            return found
-function DLS(node, depth)
-    if (IS_GOAL(node)) then
-        return node
-    if (depth > 0) then
-        for each (child in EXPAND(node))
-            found = DLS(child, depth - 1)
-            if (found != NULL) then
-                return found
-    return NULL
-    */
+       function IDDFS(node)
+       for (depth = 0; ; depth++)
+       found = DLS(node, depth)
+       if (found != NULL) then
+       return found
+       function DLS(node, depth)
+       if (IS_GOAL(node)) then
+       return node
+       if (depth > 0) then
+       for each (child in EXPAND(node))
+       found = DLS(child, depth - 1)
+       if (found != NULL) then
+       return found
+       return NULL
+       */
 
     Deque<BoardNode> iddfs(BoardNode start, BoardNode goal, BoardNode goal2){
       for (int depth = 0; ; depth++){
@@ -60,6 +128,7 @@ function DLS(node, depth)
       if (node.priority > depth){
         return null;
       }
+
       for (BoardNode neighbor : node.neighbors()){
         if (!node.isCritical(neighbor)){
           BoardNode found = dls(neighbor, depth-1, goal, goal2);
@@ -282,7 +351,8 @@ function DLS(node, depth)
     }
 
     public Iterable<BoardNode> neighbors(){
-      Deque<BoardNode> q = new ArrayDeque<BoardNode>();
+      PriorityQueue<BoardNode> q = new PriorityQueue<BoardNode>(new PriorityComparator());
+      // Deque<BoardNode> q = new ArrayDeque<BoardNode>();
       for (Board bd : board.neighbors()){
         q.add(new BoardNode(this, bd, moves+1));
       }
@@ -338,8 +408,9 @@ function DLS(node, depth)
       BoardNode bd = new BoardNode(null, start, 0);
       BoardNode gl = new BoardNode(null, goal(start), 0);
       BoardNode gl2 = new BoardNode(null, goal(start).twin(), 0);
-      // result = aStar(bd, gl, gl2);
-      result = iddfs(bd, gl, gl2);
+      result = aStar(bd, gl, gl2);
+      // result = ida_star(bd, gl, gl2);
+      // result = iddfs(bd, gl, gl2);
       // result = aStarDual(bd, gl, gl2);
       // result = aStarOpenSet(bd, gl, gl2);
       // result = aStarNoSet(bd, gl, gl2);
