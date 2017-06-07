@@ -2,6 +2,63 @@ import edu.princeton.cs.algs4.*;
 import java.util.*;
 
 public class Solver {
+  private final AStarSolver aStarSolver;
+
+  public Solver(Board initial)           // find a solution to the initial board (using the A* algorithm)
+  {
+    aStarSolver = new AStarSolver(initial);
+  }
+  public boolean isSolvable()            // is the initial board solvable?
+  {
+    return aStarSolver.result != null;
+  }
+  public int moves()                     // min number of moves to solve initial board; -1 if unsolvable
+  {
+    return isSolvable() ? aStarSolver.result.size()-1 : -1;
+  }
+
+  public Iterable<Board> solution()      // sequence of boards in a shortest solution; null if unsolvable
+  {
+    if (!isSolvable()){
+      return null;
+    }
+
+    Deque<Board> q = new ArrayDeque<Board>();
+    for (BoardNode node : aStarSolver.result){
+      q.addFirst(node.board);
+    }
+    return q;
+  }
+
+  public static void main(String[] args) {
+    // create initial board from file
+    In in = new In(args[0]);
+    int n = in.readInt();
+    int[][] blocks = new int[n][n];
+    for (int i = 0; i < n; i++)
+      for (int j = 0; j < n; j++)
+        blocks[i][j] = in.readInt();
+    Board initial = new Board(blocks);
+
+    // solve the puzzle
+    Solver solver = new Solver(initial);
+
+    // print solution to standard output
+    if (!solver.isSolvable())
+      StdOut.println("No solution possible");
+    else {
+      StdOut.println("Minimum number of moves = " + solver.moves());
+      for (Board board : solver.solution())
+        StdOut.println(board);
+    }
+  }
+
+  /*
+
+  ######## private ########
+
+  */
+
   private class PriorityComparator implements Comparator<BoardNode>{
     public int compare(BoardNode a, BoardNode b){
       return Integer.compare(a.priority,  b.priority);
@@ -9,7 +66,7 @@ public class Solver {
   }
 
   abstract private class AStar{
-    Deque<BoardNode> aStar(BoardNode start, BoardNode goal, BoardNode goal2){
+    Deque<BoardNode> aStar(BoardNode start, BoardNode goal, BoardNode goalTwin){
       Set<BoardNode> closedSet = new TreeSet<BoardNode>();
       MinPQ<BoardNode> q = new MinPQ<BoardNode>(new PriorityComparator());
       q.insert(start);
@@ -18,15 +75,13 @@ public class Solver {
         BoardNode current = q.delMin();
         if (current.board.equals(goal.board))
           return path(current);
-        if (current.board.equals(goal2.board))
+        if (current.board.equals(goalTwin.board))
           return null;
 
         closedSet.add(current);
         for (BoardNode neighbor : current.neighbors()){
-          if (!closedSet.contains(neighbor)){
-            if (!current.isCritical(neighbor)){
-              q.insert(neighbor);
-            }
+          if (!closedSet.contains(neighbor) && !current.isCritical(neighbor)){
+            q.insert(neighbor);
           }
         }
       }
@@ -135,54 +190,6 @@ public class Solver {
     }
   }
 
-  private final AStarSolver aStarSolver;
-  public Solver(Board initial)           // find a solution to the initial board (using the A* algorithm)
-  {
-    aStarSolver = new AStarSolver(initial);
-  }
-  public boolean isSolvable()            // is the initial board solvable?
-  {
-    return aStarSolver.result != null;
-  }
-  public int moves()                     // min number of moves to solve initial board; -1 if unsolvable
-  {
-    return isSolvable() ? aStarSolver.result.size()-1 : -1;
-  }
 
-  public Iterable<Board> solution()      // sequence of boards in a shortest solution; null if unsolvable
-  {
-    if (!isSolvable()){
-      return null;
-    }
-
-    Deque<Board> q = new ArrayDeque<Board>();
-    for (BoardNode node : aStarSolver.result){
-      q.addFirst(node.board);
-    }
-    return q;
-  }
-
-  public static void main(String[] args) {
-    // create initial board from file
-    In in = new In(args[0]);
-    int n = in.readInt();
-    int[][] blocks = new int[n][n];
-    for (int i = 0; i < n; i++)
-      for (int j = 0; j < n; j++)
-        blocks[i][j] = in.readInt();
-    Board initial = new Board(blocks);
-
-    // solve the puzzle
-    Solver solver = new Solver(initial);
-
-    // print solution to standard output
-    if (!solver.isSolvable())
-      StdOut.println("No solution possible");
-    else {
-      StdOut.println("Minimum number of moves = " + solver.moves());
-      for (Board board : solver.solution())
-        StdOut.println(board);
-    }
-  }
 }
 
