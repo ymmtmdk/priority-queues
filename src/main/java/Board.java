@@ -21,89 +21,6 @@ public class Board {
     }
   }
 
-  private void testBlocks(){
-    int[][] bl = new int[3][3];
-    bl[0][0] = 1;
-    bl[0][1] = 0;
-    bl[1][0] = 2;
-    bl[1][1] = 3;
-    LongBlocks lb = new LongBlocks(bl);
-    assert(1 == lb.get(0,0));
-    lb.set(0,0,0);
-    assert(0 == lb.get(0,0));
-    lb.set(0,0,2);
-    assert(2 == lb.get(0,0));
-    assert(2 == lb.get(1,0));
-    lb.set(1,0,5);
-    assert(5 == lb.get(1,0));
-    lb.set(1,1,15);
-    assert(15 == lb.get(1,1));
-    lb.set(2,2,6);
-    assert(6 == lb.get(2,2));
-  }
-
-  private class LongBlocks extends Blocks<Long>{
-    private long blocks;
-    final int dimension;
-
-    LongBlocks(int[][] blocks){
-      this.dimension = blocks.length;
-      assert(dimension <= 4);
-      this.blocks = copyInt(blocks);
-    }
-
-    LongBlocks(long blocks, int dimension){
-      this.dimension = dimension;
-      assert(dimension <= 4);
-      this.blocks = copyT(blocks);
-    }
-
-    int dimension(){
-      return dimension;
-    }
-
-    long idx(int row, int col){
-      return row*dimension+col;
-    }
-
-    int get(int row, int col){
-      long n = (blocks >> ((row*dimension+col)*4)) & 0x0f;
-      return (int)n;
-    }
-
-    String str(long n){
-      return String.format("%64s", Long.toBinaryString(n));
-    }
-
-    void set(int row, int col, int n){
-      assert(n<16);
-      long l = n;
-      long mask = ~(0x0fL << (row*dimension+col)*4);
-      long m = l << (row*dimension+col)*4;
-      blocks = (blocks & mask) | m;
-    }
-
-    Long copyInt(int[][] blocks){
-      int dimension = blocks.length;
-      long r = 0;
-      for (int row = 0; row < dimension; row++){
-        for (int col = 0; col < dimension; col++){
-          long l = blocks[row][col];
-          r |= (l << (idx(row,col)*4));
-        }
-      }
-      return r;
-    }
-
-    Long copyT(Long blocks){
-      return blocks;
-    }
-
-    LongBlocks dup(){
-      return new LongBlocks(blocks, dimension);
-    }
-  }
-
   private class CharAryBlocks extends Blocks<char []>{
     private final char[] blocks;
     final int dimension;
@@ -196,9 +113,7 @@ public class Board {
       }
     }
 
-    // assert(r > 0);
     return r;
-    // return reduce(blocks, 7*blocks.length+3, (t, row, col, n) -> t * 23 + n);
   }
 
   private long calcHash(){
@@ -229,17 +144,6 @@ public class Board {
         }
       }
     }
-    /*
-       count(blocks, (row, col, n) -> {
-       if (n == 0){
-       point[0] = row;
-       point[1] = col;
-       return true;
-       }
-       return false;
-       });
-
-*/
     return point;
   }
 
@@ -418,43 +322,6 @@ public class Board {
     return Math.abs(distRow)+Math.abs(distCol)+lineConflict;
   }
 
-  private static void testMahattan2(){
-    /*
-       3 1 8    1 2 3
-       7   2    4 5 6
-       4 5 6    7 8
-       */
-    int[][] bl = new int[3][3];
-    bl[0][0] = 3;
-    bl[0][1] = 1;
-    bl[0][2] = 8;
-    bl[1][0] = 7;
-    bl[1][1] = 0;
-    bl[1][2] = 2;
-    bl[2][0] = 4;
-    bl[2][1] = 6;
-    bl[2][2] = 5;
-    Board bd = new Board(bl);
-    assert(bd.correctDistCol(0,0) == 2);
-    assert(bd.correctDistCol(0,1) == -1);
-    assert(bd.correctDistRow(1,0) == 1);
-    assert(bd.correctDistRow(2,0) == -1);
-    assert(bd.isInCorrectRow(0,1));
-    assert(bd.isInCorrectRow(0,0));
-    assert(bd.isInCorrectRow(0,1));
-    assert(!bd.isInCorrectRow(0,2));
-    assert(bd.isInCorrectCol(1,0));
-    assert(bd.isInCorrectCol(2,0));
-    assert(!bd.isInCorrectCol(0,0));
-    assert(!bd.isInCorrectCol(0,1));
-    assert(bd.manhattan2(0,0) == 3);
-    assert(bd.manhattan2(0,1) == 2);
-    assert(bd.manhattan2(0,2) == 3);
-    assert(bd.manhattan2(1,0) == 2);
-    assert(bd.manhattan2(1,1) == 0);
-    assert(bd.manhattan2(2,0) == 2);
-  }
-
   private int calcManhattan()                 // sum of Manhattan distances between blocks and goal
   {
     int m = 0;
@@ -516,18 +383,10 @@ public class Board {
       row2 = 1;
     }
 
-    assert(blocks.get(rowOfBlank, colOfBlank) == 0);
-    assert(blocks.get(row1, col1) != 0);
-    assert(blocks.get(row2, col2) != 0);
-    // println("ex: "+ rowOfBlank + ":" + colOfBlank + ":" + row1);
     exchange(row1, col1, row2, col2);
     Board bd = new Board(blocks.copyAsInt());
     exchange(row1, col1, row2, col2);
-    // Board bd = exBoard(rowOfBlank, colOfBlank, row1, col1, row2, col2);
-    // println(bd);
-    assert(bd.blocks.get(rowOfBlank, colOfBlank) == 0);
-    assert(bd.blocks.get(row1, col1) != 0);
-    assert(bd.blocks.get(row2, col2) != 0);
+
     return bd;
   }
 
@@ -537,16 +396,6 @@ public class Board {
     if (other == null) return false;
     if (other.getClass() != this.getClass()) return false;
     Board that = (Board) other;
-    /*
-       if (hashCode == that.hashCode){
-    // println("" + rowOfBlank +", "+ that.rowOfBlank);
-    assert(rowOfBlank == that.rowOfBlank);
-    assert(colOfBlank == that.colOfBlank);
-    assert(hamming == that.hamming);
-    assert(manhattan == that.manhattan);
-    assert(isGoal == that.isGoal);
-       }
-       */
     return hashCode == that.hashCode && manhattan == that.manhattan;
   }
 
