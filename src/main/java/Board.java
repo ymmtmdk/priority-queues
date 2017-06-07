@@ -384,18 +384,13 @@ public class Board {
 
   private Board neighbor(int row, int col){
     int n = blocks.get(row, col);
-
-    // int prevManhattan = manhattan(n, blocks.dimension(), row, col);
     int prevHamming = hamming(n, dimension(), row, col);
 
     exchange(rowOfBlank, colOfBlank, row, col);
-    // int nextManhattan = manhattan(n, blocks.dimension(), rowOfBlank, colOfBlank);
+
     int nextHamming = hamming(n,  dimension(), rowOfBlank, colOfBlank);
-    // int newManhattan = manhattan - prevManhattan + nextManhattan;
     int newManhattan = calcManhattanWithLinearConflict();
-    // int newManhattan = calcManhattan();
     int newHamming = hamming - prevHamming + nextHamming;
-    // long newHash = calcHash(row, col, rowOfBlank, colOfBlank);
     long newHash = calcHash();
 
     Board bd = new Board(blocks.dup(), dimension(), row, col, newHamming, newManhattan, newManhattan==0, newHash);
@@ -403,4 +398,26 @@ public class Board {
 
     return bd;
   }
+
+  /*
+  private Board neighbor(int row, int col){
+    int n = blocks.get(row, col);
+
+    int prevManhattan = manhattan(n, dimension(), row, col);
+    int prevHamming = hamming(n, dimension(), row, col);
+
+    exchange(rowOfBlank, colOfBlank, row, col);
+
+    int nextManhattan = manhattan(n, dimension(), rowOfBlank, colOfBlank);
+    int nextHamming = hamming(n,  dimension(), rowOfBlank, colOfBlank);
+    int newManhattan = manhattan - prevManhattan + nextManhattan;
+    int newHamming = hamming - prevHamming + nextHamming;
+    long newHash = calcHash();
+
+    Board bd = new Board(blocks.dup(), dimension(), row, col, newHamming, newManhattan, newManhattan==0, newHash);
+    exchange(rowOfBlank, colOfBlank, row, col);
+
+    return bd;
+  }
+  */
 }
