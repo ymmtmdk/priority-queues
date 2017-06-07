@@ -79,20 +79,9 @@ public class Board {
   private final int rowOfBlank, colOfBlank;
   private final long hashCode;
 
-  private static Map<Long, Board> boardCache;
-
   private static Board newBoard(CharAryBlocks blocks, int dimension, int rowOfBlank, int colOfBlank, int hamming, int manhattan, boolean isGoal, long hashCode){
-    if (boardCache == null){
-      boardCache = new HashMap<Long, Board>();
-    }
-    if (boardCache.containsKey(hashCode)){
-      return boardCache.get(hashCode);
-    }
 
     Board bd = new Board(blocks.dup(), dimension, rowOfBlank, colOfBlank, hamming, manhattan, isGoal, hashCode);
-    // bd.testBlocks();
-    // bd.testMahattan2();
-    boardCache.put(hashCode, bd);
     return bd;
   }
 
