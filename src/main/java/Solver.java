@@ -8,10 +8,12 @@ public class Solver {
   {
     aStarSolver = new AStarSolver(initial);
   }
+
   public boolean isSolvable()            // is the initial board solvable?
   {
     return aStarSolver.result != null;
   }
+
   public int moves()                     // min number of moves to solve initial board; -1 if unsolvable
   {
     return isSolvable() ? aStarSolver.result.size()-1 : -1;
@@ -65,7 +67,29 @@ public class Solver {
     }
   }
 
-  abstract private class AStar{
+  private class AStarSolver{
+    final Deque<BoardNode> result;
+
+    AStarSolver(Board start){
+      BoardNode board = new BoardNode(null, start, 0);
+      BoardNode goal = new BoardNode(null, goal(start), 0);
+      BoardNode goalTwin = new BoardNode(null, goal(start).twin(), 0);
+      result = aStar(board, goal, goalTwin);
+    }
+
+    Board goal(Board board){
+      int n = board.dimension();
+      int[][] blocks = new int[n][n];
+
+      for (int row = 0; row < n; row++){
+        for (int col = 0; col < n; col++){
+          blocks[row][col] = row*n+col+1;
+        }
+      }
+      blocks[n-1][n-1] = 0;
+      return new Board(blocks);
+    }
+
     Deque<BoardNode> aStar(BoardNode start, BoardNode goal, BoardNode goalTwin){
       Set<BoardNode> closedSet = new TreeSet<BoardNode>();
       MinPQ<BoardNode> q = new MinPQ<BoardNode>(new PriorityComparator());
@@ -104,7 +128,7 @@ public class Solver {
     System.out.println(o);
   }
 
-  private static int _node_id;
+  private static int __StaticNodeId__;
 
   private class BoardNode implements Comparable<BoardNode>{
     private final Board board;
@@ -112,20 +136,19 @@ public class Solver {
     private final int id;
     private final BoardNode prevNode;
 
-    public BoardNode(BoardNode prevNode, Board board, int moves){
+    BoardNode(BoardNode prevNode, Board board, int moves){
       this.prevNode = prevNode;
       this.board = board;
-      this.id = _node_id++;
+      this.id = __StaticNodeId__++;
       this.moves = moves;
-
-      this.priority = (moves + board.manhattan());
+      this.priority = moves + board.manhattan();
     }
 
-    public BoardNode prevNode(){
+    BoardNode prevNode(){
       return prevNode;
     }
 
-    public Iterable<BoardNode> neighbors(){
+    Iterable<BoardNode> neighbors(){
       PriorityQueue<BoardNode> q = new PriorityQueue<BoardNode>(new PriorityComparator());
       for (Board bd : board.neighbors()){
         q.add(new BoardNode(this, bd, moves+1));
@@ -133,10 +156,10 @@ public class Solver {
       return q;
     }
 
-    public boolean isCritical(BoardNode that){
+    boolean isCritical(BoardNode that){
       return prevNode() != null && prevNode().board.equals(that.board);
-
     }
+
     public int compareTo(BoardNode that){
       if (board.equals(that.board)){
         return 0;
@@ -160,36 +183,5 @@ public class Solver {
       return s.toString();
     }
   }
-
-  private class AStarSolver extends AStar{
-    final Deque<BoardNode> result;
-
-    private Board goal(Board board){
-      int n = board.dimension();
-      int[][] blocks = new int[n][n];
-
-      for (int row = 0; row < n; row++){
-        for (int col = 0; col < n; col++){
-          blocks[row][col] = row*n+col+1;
-        }
-      }
-      blocks[n-1][n-1] = 0;
-      return new Board(blocks);
-    }
-
-    AStarSolver(Board start){
-      BoardNode bd = new BoardNode(null, start, 0);
-      BoardNode gl = new BoardNode(null, goal(start), 0);
-      BoardNode gl2 = new BoardNode(null, goal(start).twin(), 0);
-      result = aStar(bd, gl, gl2);
-      // result = ida_star(bd, gl, gl2);
-      // result = iddfs(bd, gl, gl2);
-      // result = aStarDual(bd, gl, gl2);
-      // result = aStarOpenSet(bd, gl, gl2);
-      // result = aStarNoSet(bd, gl, gl2);
-    }
-  }
-
-
 }
 
