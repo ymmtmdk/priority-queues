@@ -78,64 +78,6 @@ public class Board {
   private final CharAryBlocks blocks;
   private final int rowOfBlank, colOfBlank;
   private final long hashCode;
-
-  private static Board newBoard(CharAryBlocks blocks, int dimension, int rowOfBlank, int colOfBlank, int hamming, int manhattan, boolean isGoal, long hashCode){
-
-    Board bd = new Board(blocks.dup(), dimension, rowOfBlank, colOfBlank, hamming, manhattan, isGoal, hashCode);
-    return bd;
-  }
-
-  private static long fact(int n){
-    long r = 1;
-    for (int i = 1; i <= n; i++)
-      r *= i;
-    return r;
-  }
-
-  private long calcHash0(){
-    long r = 7*blocks.dimension+3;
-    for (int row = 0; row < blocks.dimension(); row++){
-      for (int col = 0; col < blocks.dimension(); col++){
-        int n = blocks.get(row, col);
-        r *= 23;
-        r += n;
-      }
-    }
-
-    return r;
-  }
-
-  private long calcHash(){
-    long r = 0;
-    for (int row = 0; row < blocks.dimension(); row++){
-      for (int col = 0; col < blocks.dimension(); col++){
-        int i = row*blocks.dimension()+col+1;
-        int n = blocks.get(row, col);
-        r += fact(i)*n;
-      }
-    }
-
-    // assert(r > 0);
-    return r;
-    // return reduce(blocks, 7*blocks.length+3, (t, row, col, n) -> t * 23 + n);
-  }
-
-  private int[] calcBlank(){
-    int[] point = new int[2];
-    int dimension = blocks.dimension();
-    for (int row = 0; row < dimension; row++){
-      for (int col = 0; col < dimension; col++){
-        int n = blocks.get(row, col);
-        if (n == 0){
-          point[0] = row;
-          point[1] = col;
-          return point;
-        }
-      }
-    }
-    return point;
-  }
-
   // (where blocks[i][j] = block in row i, column j)
   public Board(int[][] bl)           // construct a board from an n-by-n array of blocks
   {
@@ -196,6 +138,36 @@ public class Board {
     System.out.println(o);
   }
 
+  private long calcHash0(){
+    long r = 7*blocks.dimension+3;
+    for (int row = 0; row < blocks.dimension(); row++){
+      for (int col = 0; col < blocks.dimension(); col++){
+        int n = blocks.get(row, col);
+        r *= 23;
+        r += n;
+      }
+    }
+
+    return r;
+  }
+
+  private int[] calcBlank(){
+    int[] point = new int[2];
+    int dimension = blocks.dimension();
+    for (int row = 0; row < dimension; row++){
+      for (int col = 0; col < dimension; col++){
+        int n = blocks.get(row, col);
+        if (n == 0){
+          point[0] = row;
+          point[1] = col;
+          return point;
+        }
+      }
+    }
+    return point;
+  }
+
+
   private static int manhattan(int n, int dimension, int row, int col){
     /*
        8 1 3
@@ -249,11 +221,11 @@ public class Board {
       return 0;
     }
 
-   /*
-      3 1 8    1 2 3
-      7   2    4 5 6
-      4 5 6    7 8
-*/
+    /*
+       3 1 8    1 2 3
+       7   2    4 5 6
+       4 5 6    7 8
+       */
 
     int distRow = 0;
     int distCol = 0;
@@ -408,8 +380,9 @@ public class Board {
     int newHamming = hamming - prevHamming + nextHamming;
     // long newHash = calcHash(row2, col2, row1, col1);
     long newHash = calcHash0();
+
     // assert(newHash == calcHash());
-    Board bd = newBoard(blocks, blocks.dimension(), row0, col0, newHamming, newManhattan, newManhattan==0, newHash);
+    Board bd = new Board(blocks.dup(), blocks.dimension(), row0, col0, newHamming, newManhattan, newManhattan==0, newHash);
     exchange(row1, col1, row2, col2);
 
     return bd;
@@ -440,35 +413,9 @@ public class Board {
     return exBoard(row, col, rowOfBlank, colOfBlank, row, col);
   }
 
-  private long calcHash(int row1, int col1, int row2, int col2){
-    /*
-       1 2 6 24
-       0,1,2,3
-
-       0,2,1,3
-       */
-
-    long r = hashCode;
-    int n = blocks.get(row1, col1);// 1
-    int m = blocks.get(row2, col2);// 2
-    int o = n - m;
-    int i = row1*dimension+col1+1; // 2
-    int j = row2*dimension+col2+1; // 3
-    r += fact(i)*o; // fact(2)*1
-    r -= fact(j)*o; // fact(1)*1
-    return r;
-  }
-
-    private class PriorityComparator implements Comparator<Board>{
-      public int compare(Board a, Board b){
-        return Integer.compare(a.manhattan,  b.manhattan);
-      }
-    }
-
   public Iterable<Board> neighbors()
   {
     Deque<Board> q = new ArrayDeque<Board>();
-    // PriorityQueue<Board> q = new PriorityQueue<Board>(new PriorityComparator());
     if (rowOfBlank > 0){
       q.add(neighbor(Dir.UP));
     }
@@ -484,7 +431,9 @@ public class Board {
     return q;
   }
 
-  private static String blocksString(CharAryBlocks blocks){
+  public String toString()               // string representation of this board (in the output format specified below)
+  {
+
     StringBuilder s = new StringBuilder();
     int n = blocks.dimension();
     s.append(n + "\n");
@@ -495,20 +444,6 @@ public class Board {
       s.append("\n");
     }
     return s.toString();
-    /*
-       s = reduce(blocks, s, (s_, row, col, n)->{
-       s_.append(String.format("%2d ", n));
-       if (col == blocks.length-1){
-       s_.append("\n");
-       }
-       return s_;
-       });
-       return s.toString();
-       */
-  }
-
-  public String toString()               // string representation of this board (in the output format specified below)
-  {
-    return blocksString(blocks);
+    // return blocks.toString();
   }
 }

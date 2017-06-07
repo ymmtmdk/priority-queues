@@ -72,7 +72,6 @@ public class Solver {
 
     public Iterable<BoardNode> neighbors(){
       PriorityQueue<BoardNode> q = new PriorityQueue<BoardNode>(new PriorityComparator());
-      // Deque<BoardNode> q = new ArrayDeque<BoardNode>();
       for (Board bd : board.neighbors()){
         q.add(new BoardNode(this, bd, moves+1));
       }
@@ -87,7 +86,6 @@ public class Solver {
       if (board.equals(that.board)){
         return 0;
       }
-      // return priority - that.priority;
       return id - that.id;
     }
 
